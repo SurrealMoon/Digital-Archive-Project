@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import Admin from '../models/Admin';
+import Admin from '../models/admin';
 
 interface DecodedToken {
   id: string;
 }
 
+// Middleware Fonksiyonu
 const protect = async (req: Request, res: Response, next: NextFunction) => {
   let token;
 
@@ -20,7 +21,10 @@ const protect = async (req: Request, res: Response, next: NextFunction) => {
         process.env.JWT_SECRET || 'defaultsecret'
       ) as DecodedToken;
 
-      req.user = await Admin.findById(decoded.id).select('-password');
+      // Kullanıcıyı veritabanından al ve req.user'a ata
+      const user = await Admin.findById(decoded.id).select('-password');
+      (req as any).user = user; // Hata almamak için `as any` kullandık
+
       next();
     } catch (error) {
       res.status(401).json({ message: 'Not authorized, token failed' });

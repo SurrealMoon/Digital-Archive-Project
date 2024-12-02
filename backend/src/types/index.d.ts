@@ -1,9 +1,9 @@
-import { Request } from 'express';
+import { Document } from 'mongoose'; // Mongoose belgesi için tür
 
 declare global {
   namespace Express {
     interface Request {
-      user?: any; // Burada `any` yerine `Admin` veya uygun türü kullanabilirsiniz
+      user?: Document | null; // Mongoose Document türü
     }
   }
 }

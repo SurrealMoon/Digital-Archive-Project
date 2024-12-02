@@ -19,11 +19,12 @@
       "@models/*": ["models/*"],
       "@routes/*": ["routes/*"],
       "@middlewares/*": ["middlewares/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@types/*": ["types/*"]
     },
 
     /* Tip Kontrolleri */
-    "typeRoots": ["./node_modules/@types"],            /* Tip dosyalarının aranacağı dizin. */
+    "typeRoots": ["./node_modules/@types", "./src/types"],   /* Tip dosyalarının aranacağı dizin. */
 
     /* Kaynak Haritaları */
     "sourceMap": true                                 /* Derleme sonrası kaynak haritalarını oluşturur. */
