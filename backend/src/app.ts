@@ -1,8 +1,10 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import adminRoutes from './routes/adminRoutes'; // Admin routes dosyası
-import { protect } from './middlewares/authMiddleware'; // Token doğrulama middleware
+import adminRoutes from './routes/admin-routes'; // Admin routes dosyası
+import { protect } from './middlewares/auth-middleware'; // Token doğrulama middleware
+import archiveRoutes from "./routes/archive-routes";
+
 
 dotenv.config();
 
@@ -11,6 +13,8 @@ const PORT = process.env.PORT || 3002;
 const MONGO_URI = process.env.MONGO_URI || '';
 
 app.use(express.json());
+app.use("/api/archive", archiveRoutes);
+
 
 // MongoDB Connection
 const connectDB = async () => {

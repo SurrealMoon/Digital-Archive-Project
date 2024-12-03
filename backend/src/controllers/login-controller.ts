@@ -1,8 +1,6 @@
-import express, { Request, Response } from 'express';
-import Admin from '../models/admin';
+import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-
-const router = express.Router();
+import Admin from '../models/admin';
 
 // JWT Token oluşturma fonksiyonu
 const generateToken = (id: string): string => {
@@ -11,14 +9,13 @@ const generateToken = (id: string): string => {
   });
 };
 
-// Admin Login
-router.post('/login', async (req: Request, res: Response) => {
+// Admin Login Controller
+export const loginAdmin = async (req: Request, res: Response): Promise<void> => {
   const { username, password } = req.body;
 
   try {
     // Kullanıcıyı veritabanında bul
     const admin = await Admin.findOne({ username });
-    console.log('Admin:', admin);
 
     // Şifreyi doğrudan kontrol et
     if (admin && admin.password === password) {
@@ -34,6 +31,4 @@ router.post('/login', async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
-});
-
-export default router;
+};
