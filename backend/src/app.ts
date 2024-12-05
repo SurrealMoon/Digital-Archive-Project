@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import adminRoutes from './routes/admin-routes'; // Admin routes dosyası
 import { protect } from './middlewares/auth-middleware'; // Token doğrulama middleware
-import archiveRoutes from "./routes/archive-routes";
+import archiveRoutes from "./routes/application-routes";
 
 
 dotenv.config();
