@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import adminRoutes from './routes/admin-routes'; // Admin routes dosyası
 import { protect } from './middlewares/auth-middleware'; // Token doğrulama middleware
 import applicationRoutes from "./routes/application-routes";
+import violationRoutes from "./routes/violation-routes";
 
 
 dotenv.config();
@@ -14,6 +15,7 @@ const MONGO_URI = process.env.MONGO_URI || '';
 
 app.use(express.json());
 app.use("/api/archive", applicationRoutes);
+app.use("/api/violations", violationRoutes);
 
 
 // MongoDB Connection
