@@ -2,39 +2,39 @@ import mongoose, { Schema, Document } from "mongoose";
 
 // Başvuru Şeması Arayüzü
 export interface IApplication extends Document {
-  tcKimlik: string;
-  adSoyad: string;
-  telefon: string;
-  email: string;
-  adres?: string;
-  basvuruTarihi: Date;
-  hakIhlaliTuru: string; // Vatandaşın yazdığı olay türü
-  hakIhlaliId?: mongoose.Types.ObjectId; // Hak İhlali Şeması referansı
-  olayOzeti: string;
-  olayDetayi: string;
-  dokumanBaslik?: string;
-  dokumanlar?: string[];
-  islemYapanPersonel?: string; // Başvuruyla ilgilenen baro personeli
-  avukatId?: mongoose.Types.ObjectId; // Atanan avukat
+  citizenId: string; // TC Kimlik numarası
+  fullName: string; // Başvuran adı ve soyadı
+  phone: string; // Telefon numarası
+  email: string; // E-posta adresi
+  address?: string; // Adres
+  applicationDate: Date; // Başvuru tarihi
+  violationType: string; // Vatandaşın yazdığı olay türü
+  violationId?: mongoose.Types.ObjectId; // Hak İhlali Şeması referansı
+  eventSummary: string; // Olay özeti
+  eventDetails: string; // Olayın detayları
+  documentTitle?: string; // Döküman başlığı
+  documents?: string[]; // Dökümanlar (dosya yolları)
+  processedBy?: string; // Başvuruyu düzenleyen baro personelinin adı
+  lawyerId?: mongoose.Types.ObjectId; // Atanan avukatın referansı
 }
 
 // Başvuru Şeması
 const ApplicationSchema: Schema = new Schema(
   {
-    tcKimlik: { type: String, required: true, unique: true },
-    adSoyad: { type: String, required: true },
-    telefon: { type: String, required: true },
-    email: { type: String, required: true },
-    adres: { type: String },
-    basvuruTarihi: { type: Date, required: true, default: Date.now },
-    hakIhlaliTuru: { type: String, required: true }, // Vatandaşın yazdığı olay türü
-    hakIhlaliId: { type: mongoose.Schema.Types.ObjectId, ref: "Violation" }, // Hak İhlali Şeması referansı
-    olayOzeti: { type: String, required: true },
-    olayDetayi: { type: String, required: true },
-    dokumanBaslik: { type: String },
-    dokumanlar: { type: [String] }, // Dosyaları liste olarak tutar
-    islemYapanPersonel: { type: String }, // Başvuruyu düzenleyen baro personeli
-    avukatId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Atanan avukat
+    citizenId: { type: String, required: true, unique: true }, // TC Kimlik numarası
+    fullName: { type: String, required: true }, // Ad ve soyad
+    phone: { type: String, required: true }, // Telefon numarası
+    email: { type: String, required: true }, // E-posta adresi
+    address: { type: String }, // Adres
+    applicationDate: { type: Date, required: true, default: Date.now }, // Başvuru tarihi
+    violationType: { type: String, required: true }, // Vatandaşın yazdığı olay türü
+    violationId: { type: mongoose.Schema.Types.ObjectId, ref: "Violation" }, // Hak İhlali Şeması referansı
+    eventSummary: { type: String, required: true }, // Olay özeti
+    eventDetails: { type: String, required: true }, // Olay detayları
+    documentTitle: { type: String }, // Döküman başlığı
+    documents: { type: [String] }, // Dökümanlar (dosya yolları)
+    processedBy: { type: String }, // İşlem yapan baro personelinin adı
+    lawyerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Atanan avukat referansı
   },
   { timestamps: true } // createdAt ve updatedAt otomatik eklenir
 );
