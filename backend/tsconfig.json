@@ -1,34 +1,24 @@
 {
   "compilerOptions": {
-    /* Dil ve Çevre Ayarları */
-    "target": "ES2016",                                /* Çıktı dosyalarının ES2016 seviyesinde olmasını sağlar. */
-    "module": "commonjs",                              /* Modül sistemi olarak CommonJS kullanılır. */
-    "esModuleInterop": true,                           /* CommonJS modülleri ile uyumlu hale getirir. */
-    "forceConsistentCasingInFileNames": true,          /* Dosya isimlendirmesinde tutarlılığı zorunlu kılar. */
-    "strict": true,                                    /* Tüm katı tip denetimlerini aktif eder. */
-    "skipLibCheck": true,                              /* Harici tip dosyalarını kontrol etmez. */
-    "resolveJsonModule": true,                         /* JSON dosyalarının import edilmesini sağlar. */
-
-    /* Çıktı Dosyaları */
-    "outDir": "./dist",                                /* Derlenmiş dosyaların çıkacağı klasör. */
-    "rootDir": "./src",                                /* Kaynak dosyalarının bulunduğu ana klasör. */
-
-    /* Modül Çözümleme */
-    "baseUrl": "./src",                                /* Modül yollarının çözülmesine yardımcı olur. */
-    "paths": {                                        /* Modül yolları için alias tanımları yapılır. */
+    "target": "ES2016",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "typeRoots": ["./node_modules/@types", "./src/types"], // Tip dosyalarını buradan okur
+    "baseUrl": "./src",
+    "paths": {
       "@models/*": ["models/*"],
       "@routes/*": ["routes/*"],
       "@middlewares/*": ["middlewares/*"],
       "@utils/*": ["utils/*"],
       "@types/*": ["types/*"]
-    },
-
-    /* Tip Kontrolleri */
-    "typeRoots": ["./node_modules/@types", "./src/types"],   /* Tip dosyalarının aranacağı dizin. */
-
-    /* Kaynak Haritaları */
-    "sourceMap": true                                 /* Derleme sonrası kaynak haritalarını oluşturur. */
+    }
   },
-  "include": ["src/**/*"],                             /* Derlenmesi gereken dosyalar. */
-  "exclude": ["node_modules", "dist"]                  /* Derleme sırasında hariç tutulacak dosyalar. */
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

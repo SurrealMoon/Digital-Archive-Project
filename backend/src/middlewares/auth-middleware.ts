@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import Admin from '../models/admin';
+import Admin from '../models/user-model';
 
 interface DecodedToken {
   id: string;

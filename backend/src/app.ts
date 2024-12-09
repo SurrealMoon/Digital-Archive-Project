@@ -1,11 +1,11 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import adminRoutes from './routes/admin-routes'; // Admin routes dosyası
+import adminRoutes from './routes/admin-routes'; // Admin'e özel rotalar
+import userRoutes from './routes/user-routes'; // Kullanıcı login işlemleri için
 import { protect } from './middlewares/auth-middleware'; // Token doğrulama middleware
 import applicationRoutes from "./routes/application-routes";
 import violationRoutes from "./routes/violation-routes";
-
 
 dotenv.config();
 
@@ -14,9 +14,6 @@ const PORT = process.env.PORT || 3002;
 const MONGO_URI = process.env.MONGO_URI || '';
 
 app.use(express.json());
-app.use("/api/archive", applicationRoutes);
-app.use("/api/violations", violationRoutes);
-
 
 // MongoDB Connection
 const connectDB = async () => {
@@ -34,7 +31,10 @@ const connectDB = async () => {
 };
 
 // Routes
-app.use('/api/admin', adminRoutes); // Admin login ve diğer işlemler için
+app.use('/api/admin', adminRoutes); // Admin işlemleri için rotalar
+app.use('/api/users', userRoutes); // Kullanıcı login işlemleri için rotalar
+app.use('/api/archive', applicationRoutes); // Başvuru işlemleri
+app.use('/api/violations', violationRoutes); // Hak ihlali işlemleri
 
 // Protected Test Route (middleware testi için)
 app.get('/api/protected', protect, (req, res) => {
