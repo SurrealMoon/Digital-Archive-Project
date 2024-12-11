@@ -48,13 +48,17 @@ export const assignLawyerService = async (
 };
 
 // Hak İhlali Ekleme
+// services/application-service.ts
 export const addViolationService = async (
   applicationId: string,
   violationId: string
 ): Promise<IApplication | null> => {
-  return await Application.findByIdAndUpdate(
+  
+  const updated = await Application.findByIdAndUpdate(
     applicationId,
-    { hakIhlaliId: violationId },
+    { violationId },
     { new: true }
   );
+
+  return updated;
 };

@@ -6,6 +6,8 @@ import userRoutes from './routes/user-routes'; // Kullanıcı login işlemleri i
 import { protect } from './middlewares/auth-middleware'; // Token doğrulama middleware
 import applicationRoutes from "./routes/application-routes";
 import violationRoutes from "./routes/violation-routes";
+import caseRoutes from "./routes/case-routes"; // Dava rotalarını ekle
+
 
 dotenv.config();
 
@@ -35,6 +37,7 @@ app.use('/api/admin', adminRoutes); // Admin işlemleri için rotalar
 app.use('/api/users', userRoutes); // Kullanıcı login işlemleri için rotalar
 app.use('/api/archive', applicationRoutes); // Başvuru işlemleri
 app.use('/api/violations', violationRoutes); // Hak ihlali işlemleri
+app.use("/api/cases", caseRoutes); // Dava işlemleri rotaları
 
 // Protected Test Route (middleware testi için)
 app.get('/api/protected', protect, (req, res) => {

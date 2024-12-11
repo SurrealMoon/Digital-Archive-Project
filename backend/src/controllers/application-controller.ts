@@ -107,16 +107,17 @@ export const assignLawyer: RequestHandler = async (req, res, next) => {
 // Hak İhlali Ekleme
 export const addViolation: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { hakIhlaliId } = req.body;
-    const updatedApplication = await addViolationService(id, hakIhlaliId);
+    const { id } = req.params; // Başvuru ID'si
+    const { violationId } = req.body; // Gövdeden gelen violationId
+
+    const updatedApplication = await addViolationService(id, violationId);
 
     if (!updatedApplication) {
       res.status(404).json({ message: "Application not found" });
       return;
     }
 
-    res.status(200).json(updatedApplication);
+    res.status(200).json(updatedApplication); // Güncellenmiş kaydı döndür
     return;
   } catch (error) {
     next(error);
