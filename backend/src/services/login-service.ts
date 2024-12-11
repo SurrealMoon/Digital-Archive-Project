@@ -1,9 +1,26 @@
 import User, { IUser } from "../models/user-model";
+import bcrypt from "bcrypt";
 
-// Yeni Kullanıcı Oluşturma
+
+const SALT_ROUNDS = 10;
+
+// Yeni Kullanıcı Oluşturma (Şifre Hashleme Dahil)
 export const createUserService = async (data: Partial<IUser>): Promise<IUser> => {
+  if (data.password) {
+    // Şifreyi hashle
+    data.password = await bcrypt.hash(data.password, SALT_ROUNDS);
+  }
+
   const user = new User(data);
   return await user.save();
+};
+
+// Şifre Karşılaştırma Fonksiyonu
+export const validatePassword = async (
+  plainPassword: string,
+  hashedPassword: string
+): Promise<boolean> => {
+  return await bcrypt.compare(plainPassword, hashedPassword);
 };
 
 // Tüm Kullanıcıları Listeleme

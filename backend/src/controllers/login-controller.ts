@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../models/user-model"; // Kullanıcı modeli
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import {
   createUserService,
   getUsersService,
   getUserByIdService,
   updateUserService,
   deleteUserService,
+  validatePassword,
 } from "../services/login-service";
 
 // JWT Token oluşturma fonksiyonu
@@ -23,7 +23,7 @@ export const loginAdmin = async (req: Request, res: Response, next: NextFunction
     const { username, password } = req.body;
     const user = await User.findOne({ username, role: "admin" });
 
-    if (user && user.password === password) {
+    if (user && (await validatePassword(password, user.password))) {
       res.status(200).json({
         id: user._id,
         username: user.username,
@@ -40,17 +40,12 @@ export const loginAdmin = async (req: Request, res: Response, next: NextFunction
 
 
 // Avukat Giriş İşlemi
-export const loginLawyer = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const loginLawyer = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username, role: "lawyer" });
 
-    // Şifreyi doğrudan karşılaştırıyoruz
-    if (user && password === user.password) {
+    if (user && (await validatePassword(password, user.password))) {
       res.status(200).json({
         id: user._id,
         username: user.username,
