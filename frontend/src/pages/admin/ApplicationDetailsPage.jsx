@@ -131,11 +131,11 @@ const ApplicationDetailsPage = () => {
             <div className="flex-1">
               <Dropdown
                 label="Avukat Seç"
-                options={lawyers.map((lawyer) => lawyer.name)} // Sadece isim gösteriliyor
-                selected={selectedLawyer} // String değer
+                options={lawyers.map((lawyer) => lawyer.name)} 
+                selected={selectedLawyer} 
                 onChange={(name) => {
-                  const selected = lawyers.find((lawyer) => lawyer.name === name); // İsme göre avukatı buluyoruz
-                  setSelectedLawyer(selected); // Tüm bilgileri set ediyoruz
+                  const selected = lawyers.find((lawyer) => lawyer.name === name); 
+                  setSelectedLawyer(selected); 
                 }}
               />
 

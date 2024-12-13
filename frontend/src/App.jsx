@@ -6,6 +6,7 @@ import ApplicationPage from './pages/admin/ApplicationListPage';
 import ApplicationDetailsPage from './pages/admin/ApplicationDetailsPage'; 
 import LawyerListPage from './pages/admin/LawyerListPage';
 import CaseTrackingPage from './pages/admin/CaseTrackingListPage';
+import CaseDetailsPage from './pages/admin/CaseTrackingDetailsPage';
 import MediaScanPage from './pages/admin/HumanRightsViolationArchive/MediaScanPage';
 import StkDataPage from './pages/admin/HumanRightsViolationArchive/StkDataPage';
 import BarCommissionsPage from './pages/admin/HumanRightsViolationArchive/BarCommissionsPage';
@@ -23,6 +24,7 @@ function App() {
           <Route path="application-list" element={<ApplicationPage />} />
           <Route path="application-list/details/:id" element={<ApplicationDetailsPage />} /> 
           <Route path="case-list" element={<CaseTrackingPage/>} />
+          <Route path="case-list/details/:id" element={<CaseDetailsPage/>} /> 
           <Route path="lawyer-list" element={<LawyerListPage />} />
                 {/* Hak İhlali İzleme'nin alt sayfaları */}
           <Route path="rights-violation-archive/media-scan" element={<MediaScanPage />} />
