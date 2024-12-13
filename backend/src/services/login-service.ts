@@ -1,5 +1,7 @@
 import User, { IUser } from "../models/user-model";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
 
 
 const SALT_ROUNDS = 10;
@@ -16,12 +18,11 @@ export const createUserService = async (data: Partial<IUser>): Promise<IUser> =>
 };
 
 // Şifre Karşılaştırma Fonksiyonu
-export const validatePassword = async (
-  plainPassword: string,
-  hashedPassword: string
-): Promise<boolean> => {
+
+export const validatePassword = async (plainPassword: string, hashedPassword: string): Promise<boolean> => {
   return await bcrypt.compare(plainPassword, hashedPassword);
 };
+
 
 // Tüm Kullanıcıları Listeleme
 export const getUsersService = async (): Promise<IUser[]> => {
@@ -42,3 +43,37 @@ export const updateUserService = async (id: string, updates: Partial<IUser>): Pr
 export const deleteUserService = async (id: string): Promise<IUser | null> => {
   return await User.findByIdAndDelete(id);
 };
+
+// Kullanıcının Refresh Token'ını Güncelleme
+export const updateRefreshTokenService = async (id: string, refreshToken: string): Promise<void> => {
+  await User.findByIdAndUpdate(id, { refreshToken });
+};
+
+
+// Kullanıcının Refresh Token'ını Doğrulama
+export const validateRefreshTokenService = async (id: string, refreshToken: string): Promise<boolean> => {
+  const user = await User.findById(id);
+  return user?.refreshToken === refreshToken;
+};
+
+// Kullanıcının Refresh Token'ını Temizleme
+export const clearRefreshTokenService = async (refreshToken: string): Promise<boolean> => {
+  // Refresh Token'ı doğrula
+  const decoded: any = jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET || "defaultrefreshsecret"
+  );
+
+  // Kullanıcıyı veritabanında bul
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Kullanıcının Refresh Token'ını temizle
+  user.refreshToken = null;
+  await user.save();
+  return true;
+};
+
+

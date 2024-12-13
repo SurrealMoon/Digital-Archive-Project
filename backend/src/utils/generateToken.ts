@@ -6,4 +6,10 @@ const generateToken = (id: string) => {
   });
 };
 
-export default generateToken;
+const generateRefreshToken = (id: string): string => {
+  return jwt.sign({ id }, process.env.REFRESH_TOKEN_SECRET || "defaultrefreshsecret", {
+    expiresIn: "7d", // Refresh token geçerlilik süresi
+  });
+};
+
+export { generateToken, generateRefreshToken };

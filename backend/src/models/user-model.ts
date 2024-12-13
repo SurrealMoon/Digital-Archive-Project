@@ -11,6 +11,7 @@ export interface IUser extends Document {
   baroSicilNo?: string; // Avukat için gerekli
   email?: string; // Avukat için gerekli
   phone?: string; // Avukat için gerekli
+  refreshToken?: string | null; // refreshToken'ı interface'e ekle
 }
 
 // Kullanıcı Şeması
@@ -23,6 +24,7 @@ const userSchema = new mongoose.Schema<IUser>({
   baroSicilNo: { type: String },
   email: { type: String },
   phone: { type: String },
+  refreshToken: { type: String, default: null }, // refreshToken'ı schema'ya ekle
 });
 
 const User = mongoose.model<IUser>("User", userSchema);

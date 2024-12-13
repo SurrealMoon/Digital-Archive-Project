@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../models/user-model"; // Kullanıcı modeli
-import jwt from "jsonwebtoken";
+import { generateToken, generateRefreshToken } from "../utils/generateToken"; // Token fonksiyonlarını içe aktar
 import {
   createUserService,
   getUsersService,
@@ -8,27 +8,31 @@ import {
   updateUserService,
   deleteUserService,
   validatePassword,
+  updateRefreshTokenService,
+  clearRefreshTokenService
 } from "../services/login-service";
 
-// JWT Token oluşturma fonksiyonu
-const generateToken = (id: string): string => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || "defaultsecret", {
-    expiresIn: "1d", // Token 1 gün geçerli
-  });
-};
-
 // Admin Giriş İşlemi
-export const loginAdmin = async (req: Request, res: Response, next: NextFunction) => {
+export const loginAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username, role: "admin" });
 
     if (user && (await validatePassword(password, user.password))) {
+      const accessToken = generateToken(user._id.toString());
+      const refreshToken = generateRefreshToken(user._id.toString());
+      await updateRefreshTokenService(user._id.toString(), refreshToken);
+
       res.status(200).json({
         id: user._id,
         username: user.username,
         role: user.role,
-        token: generateToken(user._id.toString()),
+        accessToken,
+        refreshToken,
       });
     } else {
       res.status(401).json({ message: "Invalid username or password" });
@@ -38,19 +42,30 @@ export const loginAdmin = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-
 // Avukat Giriş İşlemi
-export const loginLawyer = async (req: Request, res: Response, next: NextFunction) => {
+export const loginLawyer = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username, role: "lawyer" });
 
     if (user && (await validatePassword(password, user.password))) {
+      // Access Token ve Refresh Token oluşturuluyor
+      const accessToken = generateToken(user._id.toString());
+      const refreshToken = generateRefreshToken(user._id.toString());
+
+      // Refresh token veritabanına kaydediliyor
+      await updateRefreshTokenService(user._id.toString(), refreshToken);
+
       res.status(200).json({
         id: user._id,
         username: user.username,
         role: user.role,
-        token: generateToken(user._id.toString()),
+        accessToken,
+        refreshToken,
       });
     } else {
       res.status(401).json({ message: "Invalid username or password" });
@@ -59,6 +74,36 @@ export const loginLawyer = async (req: Request, res: Response, next: NextFunctio
     next(error);
   }
 };
+
+// Kullanıcı Çıkış
+export const logoutUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      res.status(400).json({ message: "Refresh token is required" });
+      return;
+    }
+
+    // Servis fonksiyonunu çağır
+    await clearRefreshTokenService(refreshToken);
+
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(401).json({ message: error.message });
+    } else {
+      res.status(401).json({ message: "Invalid refresh token" });
+    }
+  }
+};
+
+
+
 
 
 // Yeni Kullanıcı Oluşturma (Admin veya Avukat)
@@ -131,3 +176,4 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
+
