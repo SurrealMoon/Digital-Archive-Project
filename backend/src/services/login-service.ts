@@ -1,6 +1,8 @@
 import User, { IUser } from "../models/user-model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { generateToken } from "../utils/generateToken";
+
 
 
 
@@ -76,4 +78,20 @@ export const clearRefreshTokenService = async (refreshToken: string): Promise<bo
   return true;
 };
 
+export const refreshAccessTokenService = async (refreshToken: string): Promise<string> => {
+  // Refresh token'ı doğrula
+  const decoded: any = jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET || "defaultrefreshsecret"
+  );
+
+  // Kullanıcıyı bul
+  const user = await User.findById(decoded.id);
+  if (!user || user.refreshToken !== refreshToken) {
+    throw new Error("Invalid refresh token");
+  }
+
+  // Yeni access token oluştur
+  return generateToken(user._id.toString());
+};
 

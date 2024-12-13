@@ -1,5 +1,5 @@
 import express from "express";
-import { loginAdmin, createUser, getUsers, getUserById, updateUser, deleteUser, logoutUser } from "../controllers/login-controller";
+import { loginAdmin, createUser, getUsers, getUserById, updateUser, deleteUser, logoutUser, refreshAccessToken } from "../controllers/login-controller";
 
 const router = express.Router();
 
@@ -13,6 +13,6 @@ router.get("/:id", getUserById); // Belirli bir kullanıcıyı getirme
 router.put("/:id", updateUser); // Kullanıcı güncelleme
 router.delete("/:id", deleteUser); // Kullanıcı silme
 router.post("/logout", logoutUser); // Kullanıcı Çıkış
-
+router.post("/refresh-token", refreshAccessToken);  // Refresh Token'i Yenile
 
 export default router;

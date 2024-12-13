@@ -1,6 +1,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import adminRoutes from './routes/admin-routes'; // Admin'e özel rotalar
 import userRoutes from './routes/user-routes'; // Kullanıcı login işlemleri için
 import { protect } from './middlewares/auth-middleware'; // Token doğrulama middleware
@@ -8,14 +10,19 @@ import applicationRoutes from "./routes/application-routes";
 import violationRoutes from "./routes/violation-routes";
 import caseRoutes from "./routes/case-routes"; // Dava rotalarını ekle
 
-
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3002;
 const MONGO_URI = process.env.MONGO_URI || '';
 
+// Middleware
 app.use(express.json());
+app.use(cookieParser()); // Cookie'leri okuyabilmek için
+app.use(cors({
+  origin: "http://localhost:3000", // Frontend URL'nizi buraya yazın
+  credentials: true, // Cookie gönderimi için izin ver
+}));
 
 // MongoDB Connection
 const connectDB = async () => {
