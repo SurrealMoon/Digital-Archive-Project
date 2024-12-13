@@ -1,78 +1,43 @@
 import React from 'react';
-import Button from '../components/Button'; 
-import InputField from '../components/InputField'; 
+import Button from '../components/Button';
+import InputField from '../components/InputField';
 import HitasLogo from '../assets/HitasLogo.png';
 
 const LoginPage = () => {
   return (
     <div
+      className="h-screen bg-cover bg-center flex justify-center items-center"
       style={{
         backgroundImage: `url('https://i.pinimg.com/736x/1b/e6/3c/1be63c90b9cca12a901516396e50a415.jpg')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
       }}
     >
-      <div
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-          padding: '30px',
-          borderRadius: '15px',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          width: '400px',
-          textAlign: 'center',
-        }}
-      >
+      <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg w-96 text-center">
         <img
           src={HitasLogo}
           alt="Logo"
-          style={{
-            width: '180px',
-            marginBottom: '10px',
-            display: 'block', 
-            marginLeft: 'auto', 
-            marginRight: 'auto', 
-          }}
+          className="w-44 mx-auto mb-4"
         />
-      <h1 
-  style={{ 
-    fontSize: '30px', 
-    fontWeight: 'bold', 
-    marginBottom: '30px', 
-    color: '#be123c', 
-  }}
->
-  HİTAS Kullanıcı Girişi
-</h1>
-
-<h1
-style={{ 
-    fontSize: '20px', // Başlığı daha büyük yapmak için
-    marginBottom: '30px', 
-    color: '#8587A3', 
-    fontFamily:'monospace'
-  }}>
-    Hak İhlali Takip Sistemi 
-</h1>
+        <h1 className="text-2xl font-bold text-rose-700 mb-4">
+          HİTAS Kullanıcı Girişi
+        </h1>
+        <h2 className="text-lg text-gray-600 font-mono mb-6">
+          Hak İhlali Takip Sistemi
+        </h2>
         <InputField
           placeholder="T.C. Kimlik No"
           type="text"
-          style={{ marginBottom: '15px' }}
+          className="mb-4 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
         />
         <InputField
           placeholder="Şifre"
           type="password"
-          style={{ marginBottom: '20px' }}
+          className="mb-6 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
         />
         <Button
           label="Sisteme Giriş"
-          className="bg-rose-700 text-white hover:bg-blue-700"
+          className="w-full py-2 bg-rose-700 text-white rounded hover:bg-rose-800 focus:ring-2 focus:ring-rose-700"
           onClick={() => alert('Giriş yapıldı!')}
         />
-       
       </div>
     </div>
   );

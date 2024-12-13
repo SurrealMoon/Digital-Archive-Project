@@ -11,14 +11,12 @@ const PublicInstitutionsPage = () => {
 
   return (
     <div className="flex flex-col items-center p-8 bg-gray-50 min-h-screen">
-      <div className="bg-[#47A7A2] text-white text-2xl uppercase font-bold px-4 py-2 mb-5 rounded-lg shadow-lg">
-        HAK İHLALİ İZLEME LİSTESİ
-        </div>
+      
 
       {/* Liste Wrapper */}
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Tablo Başlığı */}
-        <div className="bg-[#47A7A2] text-white text-sm uppercase font-semibold px-6 py-4">
+        <div className="bg-rose-800 text-white text-sm uppercase font-semibold px-6 py-4">
          Kamu Kurumları
         </div>
 

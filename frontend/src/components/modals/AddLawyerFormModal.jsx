@@ -3,17 +3,36 @@ import useLawyerStore from "../../store/useLawyerStore";
 import InputField from "../InputField";
 import Button from "../Button";
 
-const LawyerForm = () => {
-  const { formData, setFormData, addLawyer, closeModal, resetFormData } =
-    useLawyerStore();
+const LawyerForm = ({ isEditing, editingLawyer }) => {
+  const {
+    formData,
+    setFormData,
+    addLawyer,
+    updateLawyer,
+    closeModal,
+    resetFormData,
+  } = useLawyerStore();
+
+  React.useEffect(() => {
+    if (isEditing && editingLawyer) {
+      setFormData(editingLawyer); // Pre-fill form for editing
+    } else {
+      resetFormData(); // Reset form for new lawyer
+    }
+  }, [isEditing, editingLawyer, setFormData, resetFormData]);
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
   };
 
   const handleSubmit = () => {
-    addLawyer();
-    alert("Avukat başarıyla kaydedildi!");
+    if (isEditing) {
+      updateLawyer();
+      alert("Avukat bilgileri başarıyla güncellendi!");
+    } else {
+      addLawyer();
+      alert("Avukat başarıyla kaydedildi!");
+    }
     resetFormData();
     closeModal();
   };
@@ -32,7 +51,7 @@ const LawyerForm = () => {
       }}
     >
       <h1 style={{ textAlign: "center", marginBottom: "20px", fontWeight: "bold" }}>
-        Avukat Kayıt Formu
+        {isEditing ? "Avukat Bilgilerini Düzenle" : "Avukat Kayıt Formu"}
       </h1>
       <InputField
         label="Avukat Ad-Soyad"
@@ -67,7 +86,7 @@ const LawyerForm = () => {
         type="tel"
       />
       <Button
-        label="Avukatı Kaydet"
+        label={isEditing ? "Avukatı Güncelle" : "Avukatı Kaydet"}
         onClick={handleSubmit}
         className="bg-yellow-400 text-white hover:bg-green-500 w-full"
         style={{ marginTop: "20px" }}

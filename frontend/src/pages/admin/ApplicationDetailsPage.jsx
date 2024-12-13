@@ -26,8 +26,8 @@ const ApplicationDetailsPage = () => {
   const handleAddLawyer = () => {
     if (selectedLawyer && application) {
       addApplicationLawyer(application.id, selectedLawyer);
-      alert(`Avukat ${selectedLawyer} başarıyla eklendi!`);
-      setSelectedLawyer("");
+      alert(`Avukat ${selectedLawyer.name} başarıyla eklendi!`);
+      setSelectedLawyer(null);
     } else {
       alert("Lütfen bir avukat seçin.");
     }
@@ -131,10 +131,16 @@ const ApplicationDetailsPage = () => {
             <div className="flex-1">
               <Dropdown
                 label="Avukat Seç"
-                options={lawyers.map((lawyer) => lawyer.name)}
-                selected={selectedLawyer}
-                onChange={setSelectedLawyer}
+                options={lawyers.map((lawyer) => lawyer.name)} // Sadece isim gösteriliyor
+                selected={selectedLawyer} // String değer
+                onChange={(name) => {
+                  const selected = lawyers.find((lawyer) => lawyer.name === name); // İsme göre avukatı buluyoruz
+                  setSelectedLawyer(selected); // Tüm bilgileri set ediyoruz
+                }}
               />
+
+
+
               <button
                 onClick={handleAddLawyer}
                 className="w-full mt-1 bg-amber-400 text-white px-4 py-2 rounded hover:bg-rose-800 transition"

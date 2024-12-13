@@ -14,6 +14,7 @@ const useApplicationStore = create((set) => ({
     summary: "",
     documentInfo: "",
     documents: [],
+    index: "",
   },
   applications: [],
 
@@ -23,40 +24,41 @@ const useApplicationStore = create((set) => ({
   setFormData: (newData) =>
     set((state) => ({ formData: { ...state.formData, ...newData } })),
 
- resetFormData: () =>
-  set((state) => ({
-    formData: {
-      ...state.formData, 
-      name: "",
-      idNumber: "",
-      email: "",
-      phone: "",
-      address: "",
-      applicationDate: new Date(),
-      category: "",
-      reason: "",
-      summary: "",
-      documentInfo: "",
-      documents: [],
-    },
-  })),
-
-    addApplication: () =>
-      set((state) => ({
-        applications: [
-          ...state.applications,
-          { id: Date.now(), ...state.formData },
-        ],
-      })),
-
-  addApplicationLawyer: (applicationId, lawyerName) =>
+  resetFormData: () =>
     set((state) => ({
-      applications: state.applications.map((app) =>
-        app.id === applicationId
-          ? { ...app, lawyer: lawyerName }
-          : app
-      ),
+      formData: {
+        ...state.formData,
+        name: "",
+        idNumber: "",
+        email: "",
+        phone: "",
+        address: "",
+        applicationDate: new Date(),
+        category: "",
+        reason: "",
+        summary: "",
+        documentInfo: "",
+        documents: [],
+      },
     })),
+
+  addApplication: () =>
+    set((state) => ({
+      applications: [
+        ...state.applications,
+        { id: Date.now(), ...state.formData },
+      ],
+    })),
+
+    addApplicationLawyer: (applicationId, lawyer) =>
+      set((state) => ({
+        applications: state.applications.map((app) =>
+          app.id === applicationId
+            ? { ...app, lawyer: { name: lawyer.name, id: lawyer.value } } 
+            : app
+        ),
+      })),
+    
 
   assignHandler: (applicationId, handlerName) =>
     set((state) => ({
@@ -66,13 +68,13 @@ const useApplicationStore = create((set) => ({
           : app
       ),
     })),
-    
-    updateApplication: (applicationId) =>
-      set((state) => ({
-        applications: state.applications.map((app) =>
-          app.id === applicationId ? { ...app, ...state.formData } : app
-        ),
-      })),
+
+  updateApplication: (applicationId) =>
+    set((state) => ({
+      applications: state.applications.map((app) =>
+        app.id === applicationId ? { ...app, ...state.formData } : app
+      ),
+    })),
 }));
 
 export default useApplicationStore;

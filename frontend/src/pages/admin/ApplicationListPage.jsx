@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useApplicationStore from "../../store/useApplicationStore";
 import { FcOpenedFolder } from "react-icons/fc";
@@ -8,10 +8,30 @@ import ApplicationForm from "../../components/modals/ApplicationFormModal";
 const ApplicationListPage = () => {
   const { applications, isModalOpen, openModal, closeModal } = useApplicationStore();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState(""); 
+
+ 
+  const filteredApplications = applications.filter((item) => {
+    const lowerQuery = searchQuery.toLowerCase();
+    return (
+      item.name.toLowerCase().includes(lowerQuery) || 
+      (item.category && item.category.toLowerCase().includes(lowerQuery)) || 
+      (item.handler && item.handler.toLowerCase().includes(lowerQuery)) ||
+      (item.lawyer?.name && item.lawyer?.name.toLowerCase().includes(lowerQuery))
+    );
+  });
 
   return (
-    <div className="flex flex-col items-center p-8 bg-gray-50 min-h-screen">
-      <div className="mb-5 ml-auto">
+    <div className="rounded-xl flex flex-col items-center p-8 bg-gray-50 min-h-screen">
+      {/* Arama Kutusu */}
+      <div className="mb-5 w-full max-w-4xl flex justify-between">
+        <input
+          type="text"
+          placeholder="Ara: Ad-Soyad, Hak İhlal Türü vb."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="border border-rose-800 focus:border-green-800 px-4 py-2 rounded-xl w-1/3 transition"
+        />
         <Button
           label="Yeni Kayıt"
           className="bg-amber-400 text-white px-4 py-2 rounded hover:bg-rose-800 transition"
@@ -30,10 +50,10 @@ const ApplicationListPage = () => {
             <div className="flex-1">Hak İhlal Türü</div>
             <div className="flex-1 ml-2 ">Atanan Avukat</div>
             <div className="flex-1 ml-2">Başvuruyu Ele Alan</div>
-            <div className="w-24 text-center">Detay</div>
+            <div className="w-24 text-center">Düzenle</div>
           </div>
 
-          {applications.map((item, index) => (
+          {filteredApplications.map((item, index) => (
             <div
               key={item.id}
               className="flex items-center px-6 py-4 hover:bg-gray-50 transition"
@@ -41,7 +61,7 @@ const ApplicationListPage = () => {
               <div className="w-20 mr-5 text-center text-gray-800">{index + 1}</div>
               <div className="mr-5 flex-1 text-gray-800">{item.name}</div>
               <div className="mr-3 flex-1 text-gray-800">{item.category || "Belirtilmemiş"}</div>
-              <div className="flex-1 text-gray-800">{item.lawyer || "Belirtilmemiş"}</div>
+              <div className="flex-1 text-gray-800">{item.lawyer?.name || "Belirtilmemiş"}</div>
               <div className="flex-1 text-gray-800">{item.handler || "Belirtilmemiş"}</div>
               <div className="w-24 flex items-center justify-center gap-2">
                 <Button
