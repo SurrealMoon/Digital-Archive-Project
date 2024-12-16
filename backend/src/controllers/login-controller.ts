@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../models/user-model"; // Kullanıcı modeli
-import { generateToken, generateRefreshToken } from "../utils/generateToken"; // Token fonksiyonlarını içe aktar
+import User from "../models/user-model"; 
+import { generateToken, generateRefreshToken } from "../utils/generateToken";
 import {
   createUserService,
   getUsersService,
