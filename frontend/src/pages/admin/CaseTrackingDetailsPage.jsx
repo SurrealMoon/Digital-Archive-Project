@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import useCaseStore from "../../store/useCaseStore"; // useCaseStore import ediliyor
+import useCaseStore from "../../store/useCaseStore"; 
 
 const CaseDetailsPage = () => {
-  const { id } = useParams(); // URL parametresi ile id alınıyor
-  const { getCase } = useCaseStore(); // useCaseStore'dan getCase fonksiyonu alınıyor
-  const [application, setApplication] = useState(null); // Application verisini tutacak state
+  const { id } = useParams(); 
+  const { getCase } = useCaseStore(); 
+  const [application, setApplication] = useState(null); 
+  
 
   useEffect(() => {
-    const caseData = getCase(id); // ID ile ilgili case verisini alıyoruz
+    const caseData = getCase(id); 
     if (caseData) {
-      setApplication(caseData); // Veriyi state'e set ediyoruz
+      setApplication(caseData); 
     }
-  }, [id, getCase]); // id değiştiğinde useEffect tetikleniyor
+  }, [id, getCase]); 
 
   if (!application) {
     return <div>Dava bulunamadı.</div>;

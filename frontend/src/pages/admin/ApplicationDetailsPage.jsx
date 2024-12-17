@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import useApplicationStore from "../../store/useApplicationStore";
+import useLawyerStore from "../../store/useLawyerStore";
+import useArchiveStore from "../../store/useArchiveDetailsStore";
+import Dropdown from "../../components/Dropdown";
+import InputField from "../../components/InputField";
+import { FcOpenedFolder } from "react-icons/fc";
+import ArchiveModal from "../../components/modals/AddArchiveDetailsModal";
 import ApplicationEditModal from "../../components/modals/ApplicationEditModal";
 
 const ApplicationDetailsPage = () => {
@@ -10,9 +16,16 @@ const ApplicationDetailsPage = () => {
     updateApplication,
     formData,
     setFormData,
+    addApplicationLawyer,
+    assignHandler,
   } = useApplicationStore();
+  const lawyers = useLawyerStore((state) => state.lawyers);
+  const { openModal } = useArchiveStore();
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedLawyer, setSelectedLawyer] = useState("");
+  const [handlerName, setHandlerName] = useState("");
 
   // Başvuru detaylarını yükle
   useEffect(() => {
@@ -22,6 +35,28 @@ const ApplicationDetailsPage = () => {
     };
     fetchData();
   }, [id, fetchApplicationById]);
+
+  // Avukat ekleme işlemi
+  const handleAddLawyer = () => {
+    if (selectedLawyer && formData) {
+      addApplicationLawyer(formData.id, selectedLawyer);
+      alert(`Avukat ${selectedLawyer.name} başarıyla eklendi!`);
+      setSelectedLawyer(null);
+    } else {
+      alert("Lütfen bir avukat seçin.");
+    }
+  };
+
+  // Başvuruyu alan kişi ekleme işlemi
+  const handleAssignHandler = () => {
+    if (handlerName && formData) {
+      assignHandler(formData.id, handlerName);
+      alert(`Başvuruyu alan kişi ${handlerName} olarak eklendi!`);
+      setHandlerName("");
+    } else {
+      alert("Lütfen bir isim girin.");
+    }
+  };
 
   // Düzenleme modalını aç
   const handleEdit = () => {
@@ -66,9 +101,7 @@ const ApplicationDetailsPage = () => {
               {formData.fullName}
             </div>
             <div className="mb-4">
-              <span className="font-semibold text-gray-800">
-                Kimlik Numarası:
-              </span>{" "}
+              <span className="font-semibold text-gray-800">Kimlik Numarası:</span>{" "}
               {formData.citizenId}
             </div>
             <div className="mb-4">
@@ -84,9 +117,7 @@ const ApplicationDetailsPage = () => {
               {formData.address}
             </div>
             <div className="mb-4">
-              <span className="font-semibold text-gray-800">
-                Başvuru Tarihi:
-              </span>{" "}
+              <span className="font-semibold text-gray-800">Başvuru Tarihi:</span>{" "}
               {new Date(formData.applicationDate).toLocaleDateString()}
             </div>
             <div className="mb-4">
@@ -120,7 +151,62 @@ const ApplicationDetailsPage = () => {
             </div>
           </div>
 
-          {/* Düzenleme Modalı */}
+          <div className="mt-6 w-full flex space-x-4">
+            {/* Avukat Ekleme */}
+            <div className="flex-1">
+              <Dropdown
+                label="Avukat Seç"
+                options={lawyers.map((lawyer) => lawyer.name)}
+                selected={selectedLawyer}
+                onChange={(name) => {
+                  const selected = lawyers.find((lawyer) => lawyer.name === name);
+                  setSelectedLawyer(selected);
+                }}
+              />
+              <button
+                onClick={handleAddLawyer}
+                className="w-full mt-1 bg-amber-400 text-white px-4 py-2 rounded hover:bg-rose-800 transition"
+              >
+                Avukat Ekle
+              </button>
+            </div>
+
+            {/* Başvuruyu Alan Kişi */}
+            <div className="flex-1">
+              <label htmlFor="handlerName" className="block mb-1 text-gray-800">
+                Başvuruyu Alan Kişi
+              </label>
+              <InputField
+                id="handlerName"
+                type="text"
+                value={handlerName}
+                onChange={setHandlerName}
+                placeholder="Kişi adı girin"
+              />
+              <button
+                onClick={handleAssignHandler}
+                className="w-full mt-2 bg-amber-400 text-white px-4 py-2 rounded hover:bg-rose-800 transition"
+              >
+                Ekle
+              </button>
+            </div>
+
+            {/* Arşiv Ekleme */}
+            <div className="flex-1">
+              <button
+                onClick={openModal}
+                className="w-full text-gray-800 px-4 py-2 rounded transition flex items-center justify-center"
+              >
+                <span className="mr-2 transition-transform hover:scale-125">
+                  <FcOpenedFolder size={30} />
+                </span>
+                Arşiv Ekle / Düzenle
+              </button>
+            </div>
+          </div>
+
+          {/* Modallar */}
+          <ArchiveModal />
           {isEditModalOpen && (
             <ApplicationEditModal
               application={formData}

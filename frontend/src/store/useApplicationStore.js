@@ -89,7 +89,7 @@ const useApplicationStore = create((set, get) => ({
         applications: state.applications.map((app) =>
           app._id === id ? response.data : app
         ),
-        formData: {},
+        formData: response.data,
         isModalOpen: false,
         error: null,
       }));
