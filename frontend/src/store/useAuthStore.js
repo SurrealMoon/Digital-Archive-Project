@@ -4,29 +4,35 @@ import axiosInstance from "../utils/axiosInstance";
 const useAuthStore = create((set) => ({
   token: localStorage.getItem("token") || null, // localStorage'dan token yükle
   refreshToken: localStorage.getItem("refreshToken") || null,
+  role: localStorage.getItem("role") || null, // Kullanıcı rolünü de sakla
   error: null,
 
   // Login işlemi
   login: async (username, password) => {
     try {
-      const response = await axiosInstance.post("/admin/login", {
+      const response = await axiosInstance.post("/users/login", {
         username,
         password,
       });
 
-      const { accessToken, refreshToken } = response.data;
+      if (response && response.data) {
+        const { accessToken, refreshToken, role } = response.data;
 
-      // Tokenları state'e ve localStorage'a kaydet
-      localStorage.setItem("token", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
+        // Tokenları state'e ve localStorage'a kaydet
+        localStorage.setItem("token", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("role", role);
 
-      set({
-        token: accessToken,
-        refreshToken,
-        error: null,
-      });
-      return true;
+        set({
+          token: accessToken,
+          refreshToken,
+          role,
+          error: null,
+        });
+        return true;
+      }
     } catch (error) {
+      console.error("Login hatası:", error);
       set({ error: "Geçersiz kullanıcı adı veya şifre." });
       return false;
     }
@@ -35,14 +41,15 @@ const useAuthStore = create((set) => ({
   // Logout işlemi
   logout: async () => {
     try {
-      await axiosInstance.post("/admin/logout", {});
+      await axiosInstance.post("/users/logout");
     } catch (err) {
       console.error("Logout hatası:", err);
     } finally {
       // Tokenları temizle
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
-      set({ token: null, refreshToken: null, error: null });
+      localStorage.removeItem("role");
+      set({ token: null, refreshToken: null, role: null, error: null });
     }
   },
 

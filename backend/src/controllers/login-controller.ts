@@ -3,11 +3,11 @@ import User from "../models/user-model";
 import { generateToken, generateRefreshToken } from "../utils/generateToken";
 import {
   createUserService,
-  getUsersService,
-  getUserByIdService,
-  updateUserService,
+  updateLawyerService,
   deleteUserService,
   validatePassword,
+  getAllLawyersService,
+  getLawyerByIdService,
   updateRefreshTokenService,
   clearRefreshTokenService,
   refreshAccessTokenService
@@ -15,9 +15,7 @@ import {
 
 // Admin Giriş İşlemi
 export const loginAdmin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: Request, res: Response, next: NextFunction
 ): Promise<void> => {
   try {
     const { username, password } = req.body;
@@ -30,19 +28,18 @@ export const loginAdmin = async (
       // Refresh token'ı veritabanına kaydediyoruz
       await updateRefreshTokenService(user._id.toString(), refreshToken);
 
-      // Refresh token'ı HTTP-Only cookie'ye ekleyelim
       res.cookie("refreshToken", refreshToken, {
-        httpOnly: true, // XSS saldırılarına karşı koruma
-        secure: process.env.NODE_ENV === "production", // Sadece HTTPS üzerinde gönder
-        sameSite: "strict", // Cross-site requestlere karşı koruma
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 gün geçerlilik
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.status(200).json({
         id: user._id,
         username: user.username,
         role: user.role,
-        accessToken, // Access token
+        accessToken,
       });
     } else {
       res.status(401).json({ message: "Invalid username or password" });
@@ -54,36 +51,30 @@ export const loginAdmin = async (
 
 // Avukat Giriş İşlemi
 export const loginLawyer = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: Request, res: Response, next: NextFunction
 ): Promise<void> => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username, role: "lawyer" });
 
     if (user && (await validatePassword(password, user.password))) {
-      // Access Token ve Refresh Token oluşturuluyor
       const accessToken = generateToken(user._id.toString());
       const refreshToken = generateRefreshToken(user._id.toString());
 
-      // Refresh token veritabanına kaydediliyor
       await updateRefreshTokenService(user._id.toString(), refreshToken);
 
-      // Refresh token'ı HTTP-Only cookie'ye ekleyelim
       res.cookie("refreshToken", refreshToken, {
-        httpOnly: true, // XSS saldırılarına karşı koruma
-        secure: process.env.NODE_ENV === "production", // Sadece HTTPS üzerinde gönder
-        sameSite: "strict", // Cross-site requestlere karşı koruma
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 gün geçerlilik
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      // Yanıt olarak Access Token gönderiliyor
       res.status(200).json({
         id: user._id,
         username: user.username,
         role: user.role,
-        accessToken, // Access Token
+        accessToken,
       });
     } else {
       res.status(401).json({ message: "Invalid username or password" });
@@ -158,6 +149,11 @@ export const refreshAccessToken = async (
 // Yeni Kullanıcı Oluşturma (Admin veya Avukat)
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // Kullanıcı rolü "lawyer" ise baroSicilNo'yu username olarak ayarla
+    if (req.body.role === "lawyer" && req.body.baroSicilNo) {
+      req.body.username = req.body.baroSicilNo;
+    }
+
     const user = await createUserService(req.body);
     res.status(201).json(user);
   } catch (error) {
@@ -165,45 +161,55 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-// Tüm Kullanıcıları Listeleme
-export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllLawyers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const users = await getUsersService();
-    res.status(200).json(users);
-  } catch (error) {
-    next(error);
-  }
-};
+    const lawyers = await getAllLawyersService();
 
-// Belirli Bir Kullanıcıyı Getirme
-export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { id } = req.params;
-    const user = await getUserByIdService(id);
-
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
+    if (lawyers.length === 0) {
+      res.status(404).json({ message: "No lawyers found" });
       return;
     }
 
-    res.status(200).json(user);
+    res.status(200).json(lawyers);
   } catch (error) {
     next(error);
   }
 };
+
+
+export const getLawyerById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const lawyer = await getLawyerByIdService(id);
+
+    if (!lawyer) {
+      res.status(404).json({ message: "Lawyer not found" });
+      return;
+    }
+
+    res.status(200).json(lawyer);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 
 // Kullanıcı Güncelleme
-export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+export const updateLawyer = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { id } = req.params;
-    const updatedUser = await updateUserService(id, req.body);
+    const { id } = req.params; // Güncellenecek avukatın ID'sini al
+    const updates = req.body;
 
-    if (!updatedUser) {
-      res.status(404).json({ message: "User not found" });
+    // Güncellemeden önce role'ü kontrol et
+    const updatedLawyer = await updateLawyerService(id, { ...updates, role: "lawyer" });
+
+    if (!updatedLawyer) {
+      res.status(404).json({ message: "Lawyer not found" });
       return;
     }
 
-    res.status(200).json(updatedUser);
+    res.status(200).json({ message: "Lawyer updated successfully", data: updatedLawyer });
   } catch (error) {
     next(error);
   }

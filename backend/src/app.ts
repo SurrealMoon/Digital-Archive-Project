@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import adminRoutes from './routes/admin-routes'; // Admin'e özel rotalar
-import userRoutes from './routes/user-routes'; // Kullanıcı login işlemleri için
 import { protect } from './middlewares/auth-middleware'; // Token doğrulama middleware
 import applicationRoutes from "./routes/application-routes";
 import violationRoutes from "./routes/violation-routes";
@@ -40,8 +39,7 @@ const connectDB = async () => {
 };
 
 // Routes
-app.use('/api/admin', adminRoutes); // Admin işlemleri için rotalar
-app.use('/api/users', userRoutes); // Kullanıcı login işlemleri için rotalar
+app.use('/api/users', adminRoutes); // Admin işlemleri için rotalar
 app.use('/api/archive', applicationRoutes); // Başvuru işlemleri
 app.use('/api/violations', violationRoutes); // Hak ihlali işlemleri
 app.use("/api/cases", caseRoutes); // Dava işlemleri rotaları

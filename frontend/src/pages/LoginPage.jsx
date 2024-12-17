@@ -13,10 +13,11 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    const success = await login(username, password);
+    const success = await login(username, password);  // Role'i artık authStore'da belirliyoruz
     if (success) {
       alert("Giriş başarılı!");
-      navigate("/admin-page");
+      const role = localStorage.getItem("role");  // Roleyi localStorage'dan alıyoruz
+      navigate(role === "admin" ? "/admin-page" : "/lawyer-page"); // Yönlendirmeyi role'ye göre yapıyoruz
     } else {
       alert("Giriş başarısız: " + error);
     }
@@ -40,21 +41,21 @@ const LoginPage = () => {
 
         {/* Kullanıcı Adı */}
         <InputField
-  placeholder="Kullanıcı Adı"
-  type="text"
-  value={username}
-  onChange={setUsername} // Direkt değer döner
-  className="mb-4 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
-/>
+          placeholder="Kullanıcı Adı"
+          type="text"
+          value={username}
+          onChange={setUsername} // Direkt değer döner
+          className="mb-4 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
+        />
 
-<InputField
-  placeholder="Şifre"
-  type="password"
-  value={password}
-  onChange={setPassword} // Direkt değer döner
-  className="mb-6 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
-/>
-
+        {/* Şifre */}
+        <InputField
+          placeholder="Şifre"
+          type="password"
+          value={password}
+          onChange={setPassword} // Direkt değer döner
+          className="mb-6 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
+        />
 
         {/* Giriş Butonu */}
         <Button

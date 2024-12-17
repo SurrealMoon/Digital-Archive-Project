@@ -1,5 +1,5 @@
-import React from "react";
-import { FaUserEdit } from "react-icons/fa"; 
+import React, { useEffect } from "react";
+import { FaUserEdit } from "react-icons/fa";
 import useLawyerStore from "../../store/useLawyerStore";
 import Button from "../../components/Button";
 import LawyerForm from "../../components/modals/AddLawyerFormModal";
@@ -12,7 +12,13 @@ const LawyerListPage = () => {
     closeModal,
     setEditingLawyer,
     editingLawyer,
+    fetchLawyers,
   } = useLawyerStore();
+
+  // Avukatları listelemek için sayfa yüklendiğinde fetchLawyers'ı çağırıyoruz.
+  useEffect(() => {
+    fetchLawyers();  // Sayfa yüklendiğinde avukatları al
+  }, [fetchLawyers]);
 
   const handleEdit = (lawyer) => {
     setEditingLawyer(lawyer);
@@ -26,7 +32,7 @@ const LawyerListPage = () => {
           label="Yeni Kayıt"
           className="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-rose-800 transition"
           onClick={() => {
-            setEditingLawyer(null); 
+            setEditingLawyer(null);
             openModal();
           }}
         />
@@ -37,6 +43,7 @@ const LawyerListPage = () => {
           Avukat Detayları
         </div>
 
+        {/* Liste Başlıkları */}
         <div className="divide-y divide-gray-200">
           <div className="flex items-center bg-gray-100 px-6 py-3 text-gray-700 font-semibold text-sm">
             <div className="mr-3 w-20 text-center">Kayıt No</div>
@@ -48,28 +55,48 @@ const LawyerListPage = () => {
             <div className="w-16 text-center">Düzenle</div>
           </div>
 
-          {lawyers.map((lawyer, index) => (
-            <div
-              key={index}
-              className="flex items-center px-6 py-4 hover:bg-gray-50 transition"
-            >
-              <div className="w-20 text-center text-gray-800">{index + 1}</div>
-              <div className=" ml-3 flex-1 text-gray-800">{lawyer.name}</div>
-              <div className="flex-1 text-gray-800">{lawyer.idNumber}</div>
-              <div className="flex-1 text-gray-800">{lawyer.barNumber}</div>
-              <div className="flex-1 mr-2 text-gray-800">{lawyer.email}</div>
-              <div className="flex-1 text-gray-800">{lawyer.phone}</div>
-              <div className="w-16 text-center text-gray-800">
-                <FaUserEdit size={24}
-                  className="text-rose-800 hover:text-yellow-400 cursor-pointer ml-4"
-                  onClick={() => handleEdit(lawyer)}
-                />
+          {/* Liste Detayları */}
+          {lawyers.length > 0 ? (
+            lawyers.map((lawyer, index) => (
+              <div
+                key={lawyer._id}
+                className="flex items-center px-6 py-4 hover:bg-gray-50 transition"
+              >
+                {/* Kayıt No */}
+                <div className="w-20 text-center text-gray-800">{index + 1}</div>
+
+                {/* Ad-Soyad */}
+                <div className="flex-1 text-gray-800">{lawyer.fullName || "N/A"}</div>
+
+                {/* T.C. Kimlik No */}
+                <div className="flex-1 text-gray-800">{lawyer.tcNumber || "N/A"}</div>
+
+                {/* Baro Sicil No */}
+                <div className="flex-1 text-gray-800">{lawyer.baroSicilNo || "N/A"}</div>
+
+                {/* E-mail */}
+                <div className="flex-1 text-gray-800">{lawyer.email || "N/A"}</div>
+
+                {/* Telefon */}
+                <div className="flex-1 text-gray-800">{lawyer.phone || "N/A"}</div>
+
+                {/* Düzenle Butonu */}
+                <div className="w-16 text-center text-gray-800">
+                  <FaUserEdit
+                    size={24}
+                    className="text-rose-800 hover:text-yellow-400 cursor-pointer ml-4"
+                    onClick={() => handleEdit(lawyer)}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="text-center text-gray-500 py-6">Hiçbir avukat bulunamadı.</div>
+          )}
         </div>
       </div>
 
+      {/* Modal */}
       {isModalOpen && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"

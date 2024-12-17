@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useLawyerStore from "../../store/useLawyerStore";
 import InputField from "../InputField";
 import Button from "../Button";
@@ -15,11 +15,16 @@ const LawyerForm = ({ isEditing, editingLawyer }) => {
 
   React.useEffect(() => {
     if (isEditing && editingLawyer) {
-      setFormData(editingLawyer); // Pre-fill form for editing
+      setFormData(editingLawyer); // Düzenleme için formu doldur
     } else {
-      resetFormData(); // Reset form for new lawyer
+      resetFormData(); // Yeni kayıt için formu sıfırla
     }
   }, [isEditing, editingLawyer, setFormData, resetFormData]);
+
+  // Baro Sicil Numarası girildikçe username'i otomatik doldur
+  useEffect(() => {
+    setFormData({ username: formData.baroSicilNo });
+  }, [formData.baroSicilNo, setFormData]);
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
@@ -38,39 +43,51 @@ const LawyerForm = ({ isEditing, editingLawyer }) => {
   };
 
   return (
-    <div
-      style={{
-        padding: "20px",
-        maxWidth: "600px",
-        margin: "0 auto",
-        height: "80vh",
-        overflowY: "auto",
-        border: "1px solid #ccc",
-        borderRadius: "8px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      <h1 style={{ textAlign: "center", marginBottom: "20px", fontWeight: "bold" }}>
+    <div>
+      <h1
+        style={{
+          textAlign: "center",
+          marginBottom: "20px",
+          fontWeight: "bold",
+        }}
+      >
         {isEditing ? "Avukat Bilgilerini Düzenle" : "Avukat Kayıt Formu"}
       </h1>
+      {/* Ad-Soyad */}
       <InputField
-        label="Avukat Ad-Soyad"
-        value={formData.name}
-        onChange={handleChange("name")}
+        label="Ad-Soyad"
+        value={formData.fullName}
+        onChange={handleChange("fullName")}
         placeholder="Adınızı ve soyadınızı giriniz"
       />
+
+      {/* TC Kimlik No */}
       <InputField
         label="T.C. Kimlik No"
-        value={formData.idNumber}
-        onChange={handleChange("idNumber")}
+        value={formData.tcNumber}
+        onChange={handleChange("tcNumber")}
         placeholder="T.C. Kimlik Numaranızı giriniz"
+        type="text"
       />
+
+      {/* Baro Sicil No */}
       <InputField
         label="Baro Sicil No"
-        value={formData.barNumber}
-        onChange={handleChange("barNumber")}
+        value={formData.baroSicilNo}
+        onChange={handleChange("baroSicilNo")}
         placeholder="Baro sicil numaranızı giriniz"
       />
+
+      {/* Şifre */}
+      <InputField
+        label="Şifre"
+        value={formData.password}
+        onChange={handleChange("password")}
+        placeholder="Şifre giriniz"
+        type="password"
+      />
+
+      {/* E-mail */}
       <InputField
         label="E-mail"
         value={formData.email}
@@ -78,6 +95,8 @@ const LawyerForm = ({ isEditing, editingLawyer }) => {
         placeholder="E-posta adresinizi giriniz"
         type="email"
       />
+
+      {/* Telefon No */}
       <InputField
         label="Telefon No"
         value={formData.phone}
@@ -85,6 +104,7 @@ const LawyerForm = ({ isEditing, editingLawyer }) => {
         placeholder="Telefon numaranızı giriniz"
         type="tel"
       />
+
       <Button
         label={isEditing ? "Avukatı Güncelle" : "Avukatı Kaydet"}
         onClick={handleSubmit}

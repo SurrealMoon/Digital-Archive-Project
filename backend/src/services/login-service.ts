@@ -3,9 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { generateToken } from "../utils/generateToken";
 
-
-
-
 const SALT_ROUNDS = 10;
 
 // Yeni Kullanıcı Oluşturma (Şifre Hashleme Dahil)
@@ -20,24 +17,22 @@ export const createUserService = async (data: Partial<IUser>): Promise<IUser> =>
 };
 
 // Şifre Karşılaştırma Fonksiyonu
-
 export const validatePassword = async (plainPassword: string, hashedPassword: string): Promise<boolean> => {
   return await bcrypt.compare(plainPassword, hashedPassword);
 };
 
-
-// Tüm Kullanıcıları Listeleme
-export const getUsersService = async (): Promise<IUser[]> => {
-  return await User.find();
+// **Sadece Avukatları Listeleme** 
+export const getAllLawyersService = async (): Promise<IUser[]> => {
+  return await User.find({ role: "lawyer" }); // role: "lawyer" olanları getir
 };
 
-// Belirli Bir Kullanıcıyı Getirme
-export const getUserByIdService = async (id: string): Promise<IUser | null> => {
-  return await User.findById(id);
+// Belirli Bir Avukatı Getirme Servisi
+export const getLawyerByIdService = async (id: string): Promise<IUser | null> => {
+  return await User.findOne({ _id: id, role: "lawyer" }); // role: "lawyer" olan ve ID'ye göre kullanıcıyı getir
 };
 
 // Kullanıcı Güncelleme
-export const updateUserService = async (id: string, updates: Partial<IUser>): Promise<IUser | null> => {
+export const updateLawyerService = async (id: string, updates: Partial<IUser>): Promise<IUser | null> => {
   return await User.findByIdAndUpdate(id, updates, { new: true });
 };
 
@@ -51,13 +46,6 @@ export const updateRefreshTokenService = async (id: string, refreshToken: string
   await User.findByIdAndUpdate(id, { refreshToken });
 };
 
-
-// Kullanıcının Refresh Token'ını Doğrulama
-export const validateRefreshTokenService = async (id: string, refreshToken: string): Promise<boolean> => {
-  const user = await User.findById(id);
-  return user?.refreshToken === refreshToken;
-};
-
 // Kullanıcının Refresh Token'ını Temizleme
 export const clearRefreshTokenService = async (refreshToken: string): Promise<boolean> => {
   // Refresh Token'ı doğrula
@@ -66,7 +54,6 @@ export const clearRefreshTokenService = async (refreshToken: string): Promise<bo
     process.env.REFRESH_TOKEN_SECRET || "defaultrefreshsecret"
   );
 
-  // Kullanıcıyı veritabanında bul
   const user = await User.findById(decoded.id);
   if (!user) {
     throw new Error("User not found");
@@ -78,20 +65,17 @@ export const clearRefreshTokenService = async (refreshToken: string): Promise<bo
   return true;
 };
 
+// Yeni Access Token oluşturma
 export const refreshAccessTokenService = async (refreshToken: string): Promise<string> => {
-  // Refresh token'ı doğrula
   const decoded: any = jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET || "defaultrefreshsecret"
   );
 
-  // Kullanıcıyı bul
   const user = await User.findById(decoded.id);
   if (!user || user.refreshToken !== refreshToken) {
     throw new Error("Invalid refresh token");
   }
 
-  // Yeni access token oluştur
   return generateToken(user._id.toString());
 };
-
