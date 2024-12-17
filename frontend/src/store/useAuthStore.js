@@ -2,8 +2,8 @@ import { create } from "zustand";
 import axiosInstance from "../utils/axiosInstance";
 
 const useAuthStore = create((set) => ({
-  token: null,
-  refreshToken: null,
+  token: localStorage.getItem("token") || null, // localStorage'dan token yükle
+  refreshToken: localStorage.getItem("refreshToken") || null,
   error: null,
 
   // Login işlemi
@@ -16,10 +16,13 @@ const useAuthStore = create((set) => ({
 
       const { accessToken, refreshToken } = response.data;
 
-      // Tokenları state'e kaydet
+      // Tokenları state'e ve localStorage'a kaydet
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
       set({
         token: accessToken,
-        refreshToken, // Refresh token'ı kaydet
+        refreshToken,
         error: null,
       });
       return true;
@@ -36,12 +39,18 @@ const useAuthStore = create((set) => ({
     } catch (err) {
       console.error("Logout hatası:", err);
     } finally {
+      // Tokenları temizle
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
       set({ token: null, refreshToken: null, error: null });
     }
   },
 
   // Token'ı güncelle
-  setToken: (newToken) => set({ token: newToken }),
+  setToken: (newToken) => {
+    localStorage.setItem("token", newToken);
+    set({ token: newToken });
+  },
 }));
 
 export default useAuthStore;

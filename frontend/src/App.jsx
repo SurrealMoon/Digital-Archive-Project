@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import AdminLayoutPage from "./layout/AdminLayout";
@@ -14,8 +14,19 @@ import PublicInstitutionsPage from "./pages/admin/HumanRightsViolationArchive/Pu
 
 // ProtectedRoute bileşeni
 import ProtectedRoute from "./components/ProtectedRoute";
+import useAuthStore from "./store/useAuthStore";
 
 function App() {
+  const setToken = useAuthStore((state) => state.setToken);
+
+  // Sayfa yenilendiğinde localStorage'dan token'ı yükle
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setToken(token);
+    }
+  }, [setToken]);
+
   return (
     <Router>
       <Routes>
