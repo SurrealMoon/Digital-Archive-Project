@@ -59,7 +59,7 @@ const LawyerListPage = () => {
           {lawyers.length > 0 ? (
             lawyers.map((lawyer, index) => (
               <div
-                key={lawyer._id}
+                key={lawyer._id || index}
                 className="flex items-center px-6 py-4 hover:bg-gray-50 transition"
               >
                 {/* Kayıt No */}
