@@ -1,27 +1,46 @@
-import React from "react";
-import useApplicationStore from "../../store/useApplicationStore";
+import React, { useEffect } from "react";
 import Modal from "../Modal";
 import InputField from "../InputField";
 import TextArea from "../TextArea";
 import CategoryDropdown from "../CategoryDropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import useApplicationStore from "../../store/useApplicationStore";
 
-const ApplicationEditModal = ({ application, isOpen, onClose }) => {
-  const { formData, setFormData, updateApplication } = useApplicationStore();
+const ApplicationEditModal = ({ application, isOpen, onClose, onSubmit }) => {
+  const { formData, setFormData, resetFormData } = useApplicationStore();
 
-  React.useEffect(() => {
-    if (application) {
-      setFormData(application);
+  // Modal ilk açıldığında form verisini doldur
+  useEffect(() => {
+    if (isOpen && application) {
+      setFormData({
+        fullName: application.fullName || "",
+        citizenId: application.citizenId || "",
+        phone: application.phone || "",
+        email: application.email || "",
+        address: application.address || "",
+        applicationDate: application.applicationDate
+          ? new Date(application.applicationDate)
+          : new Date(),
+        eventCategory: application.eventCategory || "",
+        eventSummary: application.eventSummary || "",
+        eventDetails: application.eventDetails || "",
+        documents: application.documents || [],
+      });
     }
-  }, [application, setFormData]);
+    // Modal kapanırken formu sıfırla
+    if (!isOpen) resetFormData();
+  }, [isOpen]); // Bağımlılık olarak sadece isOpen kullanıldı.
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
   };
 
   const handleFileChange = (files) => {
-    const updatedFiles = [...formData.documents, ...Array.from(files)];
+    const updatedFiles = [
+      ...formData.documents,
+      ...Array.from(files).map((file) => file.name),
+    ];
     setFormData({ documents: updatedFiles });
   };
 
@@ -30,99 +49,82 @@ const ApplicationEditModal = ({ application, isOpen, onClose }) => {
     setFormData({ documents: updatedFiles });
   };
 
-  const handleSubmit = () => {
-    updateApplication(application.id);
-    alert("Başvuru başarıyla güncellendi!");
+  const handleClose = () => {
+    resetFormData();
     onClose();
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      title="Başvuru Düzenle"
-      onClose={onClose}
-      onSubmit={handleSubmit}
-    >
+    <Modal isOpen={isOpen} title="Başvuru Düzenle" onClose={handleClose} onSubmit={onSubmit}>
       <InputField
-        label="Başvuran Ad-Soyad"
-        value={formData.name}
-        onChange={handleChange("name")}
-        placeholder="Adınızı ve soyadınızı giriniz"
+        label="Ad Soyad"
+        value={formData.fullName || ""}
+        onChange={handleChange("fullName")}
       />
       <InputField
-        label="Başvuran T.C. Kimlik No"
-        value={formData.idNumber}
-        onChange={handleChange("idNumber")}
-        placeholder="T.C. Kimlik Numaranızı giriniz"
+        label="Kimlik Numarası"
+        value={formData.citizenId || ""}
+        onChange={handleChange("citizenId")}
       />
       <InputField
-        label="E-mail"
-        value={formData.email}
-        onChange={handleChange("email")}
-        placeholder="E-posta adresinizi giriniz"
-        type="email"
-      />
-      <InputField
-        label="Telefon No"
-        value={formData.phone}
+        label="Telefon"
+        value={formData.phone || ""}
         onChange={handleChange("phone")}
-        placeholder="Telefon numaranızı giriniz"
-        type="tel"
+      />
+      <InputField
+        label="E-posta"
+        value={formData.email || ""}
+        onChange={handleChange("email")}
       />
       <InputField
         label="Adres"
-        value={formData.address}
+        value={formData.address || ""}
         onChange={handleChange("address")}
-        placeholder="Adresinizi giriniz"
       />
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>Başvuru Tarihi:</label>
+      <div>
+        <label>Başvuru Tarihi</label>
         <DatePicker
-          selected={new Date(formData.applicationDate)}
-          onChange={(date) => handleChange("applicationDate")(date)}
+          selected={formData.applicationDate}
+          onChange={(date) => setFormData({ applicationDate: date })}
           dateFormat="dd/MM/yyyy"
         />
       </div>
       <CategoryDropdown
-        label="Başvuru Türü"
-        selected={formData.category}
-        onChange={handleChange("category")}
-      />
-      <InputField
-        label="Başvurma Nedeni (Olay Başlık)"
-        value={formData.reason}
-        onChange={handleChange("reason")}
-        placeholder="Başvuru nedeninizi giriniz"
+        label="Kategori"
+        selected={formData.eventCategory || ""}
+        onChange={(value) => handleChange("eventCategory")(value)}
       />
       <TextArea
-        label="Olay Özeti"
-        value={formData.summary}
-        onChange={handleChange("summary")}
-        placeholder="Olayın özetini giriniz"
-        maxLength={500}
+        label="Başlık"
+        value={formData.eventSummary || ""}
+        onChange={(value) => handleChange("eventSummary")(value)}
       />
-     
-      <div style={{ marginBottom: "15px" }}>
-        <label style={{ display: "block", marginBottom: "5px" }}>Döküman Ekleme:</label>
-        <input
-          type="file"
-          multiple
-          onChange={(e) => handleFileChange(e.target.files)}
-          style={{ display: "block", marginBottom: "10px" }}
-        />
-        {formData.documents.map((file, index) => (
-          <div key={index} style={{ marginBottom: "5px" }}>
-            <span>{file.name}</span>
-            <button
-              type="button"
-              onClick={() => handleRemoveFile(index)}
-              style={{ marginLeft: "10px", color: "red", cursor: "pointer" }}
-            >
-              Sil
-            </button>
-          </div>
-        ))}
+      <TextArea
+        label="Detaylar"
+        value={formData.eventDetails || ""}
+        onChange={(value) => handleChange("eventDetails")(value)}
+      />
+      <div>
+  <label>Belgeler</label>
+  <input type="file" multiple onChange={(e) => handleFileChange(e.target.files)} />
+  {Array.isArray(formData.documents) && formData.documents.length > 0 ? (
+    formData.documents.map((file, index) => (
+      <div key={index} className="flex items-center">
+        <span>{file}</span>
+        <button
+          type="button"
+          onClick={() => handleRemoveFile(index)}
+          style={{ marginLeft: "10px", color: "red" }}
+        >
+          Sil
+        </button>
       </div>
+    ))
+  ) : (
+    <p>Henüz belge eklenmedi.</p>
+  )}
+</div>
+
     </Modal>
   );
 };

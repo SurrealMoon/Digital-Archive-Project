@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // useNavigate import edilir
+import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import InputField from "../components/InputField";
 import HitasLogo from "../assets/HitasLogo.png";
@@ -10,13 +10,13 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const login = useAuthStore((state) => state.login);
   const error = useAuthStore((state) => state.error);
-  const navigate = useNavigate(); // useNavigate hook'u kullanılır
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     const success = await login(username, password);
     if (success) {
       alert("Giriş başarılı!");
-      navigate("/admin-page"); // Kullanıcıyı admin sayfasına yönlendir
+      navigate("/admin-page");
     } else {
       alert("Giriş başarısız: " + error);
     }
@@ -40,21 +40,21 @@ const LoginPage = () => {
 
         {/* Kullanıcı Adı */}
         <InputField
-          placeholder="Kullanıcı Adı"
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="mb-4 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
-        />
+  placeholder="Kullanıcı Adı"
+  type="text"
+  value={username}
+  onChange={setUsername} // Direkt değer döner
+  className="mb-4 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
+/>
 
-        {/* Şifre */}
-        <InputField
-          placeholder="Şifre"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mb-6 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
-        />
+<InputField
+  placeholder="Şifre"
+  type="password"
+  value={password}
+  onChange={setPassword} // Direkt değer döner
+  className="mb-6 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
+/>
+
 
         {/* Giriş Butonu */}
         <Button

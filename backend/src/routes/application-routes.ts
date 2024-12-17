@@ -11,11 +11,10 @@ import {
 
 const router = express.Router();
 
-// CRUD Routes
-router.post("/", createApplication); // Yeni başvuru oluşturma
-router.get("/", getAllApplications); // Tüm başvuruları listeleme
+router.post("/create", createApplication); // Yeni başvuru oluşturma
+router.get("/application-list", getAllApplications); // Tüm başvuruları listeleme
 router.get("/:id", getApplicationById); // Belirli bir başvuruyu getirme
-router.put("/:id", updateApplication); // Başvuru güncelleme
+router.put("/details/:id", updateApplication); // Başvuru güncelleme
 router.delete("/:id", deleteApplication); // Başvuru silme
 
 // Ek Özellikler

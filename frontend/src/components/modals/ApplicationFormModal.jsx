@@ -6,7 +6,7 @@ import TextArea from "../TextArea";
 import CategoryDropdown from "../CategoryDropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Modal from "../Modal"; 
+import Modal from "../Modal";
 
 const ApplicationForm = () => {
   const {
@@ -16,19 +16,15 @@ const ApplicationForm = () => {
     closeModal,
     resetFormData,
   } = useApplicationStore();
-  
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
   };
 
   const handleFileChange = (files) => {
-    console.log("Selected files:", files);
-    const fileArray = Array.from(files);
-    console.log("File array:", fileArray);
-    const updatedFiles = [...formData.documents, ...fileArray];
-    console.log("Updated files:", updatedFiles);
+    const updatedFiles = [...formData.documents, ...Array.from(files)];
     setFormData({ documents: updatedFiles });
   };
 
@@ -37,26 +33,26 @@ const ApplicationForm = () => {
     setFormData({ documents: updatedFiles });
   };
 
-  const handleSubmit = () => {
-    addApplication();
+  const handleSubmit = async () => {
+    console.log("Form Gönderilirkenki Data:", formData);
+    await addApplication();
     alert("Başvuru başarıyla gönderildi!");
-    resetFormData(); 
-    closeModalHandler(); 
+    resetFormData();
+    closeModalHandler();
   };
-  
 
-  const openModal = () => setIsModalOpen(true); 
+  const openModal = () => setIsModalOpen(true);
 
   const closeModalHandler = () => {
     setIsModalOpen(false);
-    closeModal(); 
+    closeModal();
   };
 
   return (
     <div>
       <Button
         label="Başvuru Formunu Aç"
-        onClick={openModal} 
+        onClick={openModal}
         className="bg-yellow-400 text-white hover:bg-emerald-600 w-full"
         style={{ marginTop: "20px" }}
       />
@@ -69,14 +65,14 @@ const ApplicationForm = () => {
       >
         <InputField
           label="Başvuran Ad-Soyad"
-          value={formData.name}
-          onChange={handleChange("name")}
+          value={formData.fullName}
+          onChange={handleChange("fullName")}
           placeholder="Adınızı ve soyadınızı giriniz"
         />
         <InputField
           label="Başvuran T.C. Kimlik No"
-          value={formData.idNumber}
-          onChange={handleChange("idNumber")}
+          value={formData.citizenId}
+          onChange={handleChange("citizenId")}
           placeholder="T.C. Kimlik Numaranızı giriniz"
         />
         <InputField
@@ -107,28 +103,34 @@ const ApplicationForm = () => {
             dateFormat="dd/MM/yyyy"
           />
         </div>
+
+        {/* Olay Kategorisi Dropdown */}
         <CategoryDropdown
-          label="Başvuru Türü"
-          selected={formData.category}
-          onChange={handleChange("category")}
+          label="Olay Kategorisi"
+          selected={formData.eventCategory}
+          onChange={(value) => {
+            handleChange("eventCategory")(value);
+            console.log("Seçilen Olay Kategorisi:", value); // Debug log
+          }}
         />
+
         <InputField
           label="Başvurma Nedeni (Olay Başlık)"
-          value={formData.reason}
-          onChange={handleChange("reason")}
+          value={formData.eventSummary}
+          onChange={handleChange("eventSummary")}
           placeholder="Başvuru nedeninizi giriniz"
         />
         <TextArea
           label="Olay Özeti"
-          value={formData.summary}
-          onChange={handleChange("summary")}
+          value={formData.eventDetails}
+          onChange={handleChange("eventDetails")}
           placeholder="Olayın özetini giriniz"
           maxLength={500}
         />
         <InputField
           label="Döküman Bilgisi"
-          value={formData.documentInfo}
-          onChange={handleChange("documentInfo")}
+          value={formData.documentTitle}
+          onChange={handleChange("documentTitle")}
           placeholder="Döküman bilgilerini giriniz"
         />
         <div style={{ marginBottom: "15px" }}>

@@ -20,7 +20,7 @@ const MONGO_URI = process.env.MONGO_URI || '';
 app.use(express.json());
 app.use(cookieParser()); // Cookie'leri okuyabilmek için
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000", // Dinamik olarak FRONTEND_URL kullanılır
+  origin: process.env.FRONTEND_URL || "http://localhost:3002", // Dinamik olarak FRONTEND_URL kullanılır
   credentials: true, // Cookie gönderimi için izin ver
 }));
 

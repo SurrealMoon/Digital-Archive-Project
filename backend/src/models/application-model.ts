@@ -8,9 +8,9 @@ export interface IApplication extends Document {
   email: string; // E-posta adresi
   address?: string; // Adres
   applicationDate: Date; // Başvuru tarihi
-  violationType: string; // Vatandaşın yazdığı olay türü
   violationId?: mongoose.Types.ObjectId; // Hak İhlali Şeması referansı
-  eventSummary: string; // Olay özeti
+  eventCategory: string; // Olay kategorisi - (Kadın cinayeti vb.)
+  eventSummary: string; // Olay başlığı
   eventDetails: string; // Olayın detayları
   documentTitle?: string; // Döküman başlığı
   documents?: string[]; // Dökümanlar (dosya yolları)
@@ -24,11 +24,11 @@ const ApplicationSchema: Schema = new Schema(
     citizenId: { type: String, required: true, unique: true }, // TC Kimlik numarası
     fullName: { type: String, required: true }, // Ad ve soyad
     phone: { type: String, required: true }, // Telefon numarası
-    email: { type: String, required: true }, // E-posta adresi
-    address: { type: String }, // Adres
+    email: { type: String, required: false }, // E-posta adresi
+    address: { type: String, required: true }, // Adres
     applicationDate: { type: Date, required: true, default: Date.now }, // Başvuru tarihi
-    violationType: { type: String, required: true }, // Vatandaşın yazdığı olay türü
     violationId: { type: mongoose.Schema.Types.ObjectId, ref: "Violation" }, // Hak İhlali Şeması referansı
+    eventCategory: { type: String, required: true }, // Olay kategorisi
     eventSummary: { type: String, required: true }, // Olay özeti
     eventDetails: { type: String, required: true }, // Olay detayları
     documentTitle: { type: String }, // Döküman başlığı

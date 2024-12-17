@@ -22,7 +22,7 @@ const InputField = ({
       <input
         type={type}
         value={value || ""} // Null safety için default değer
-        onChange={(e) => onChange(e)} // Doğrudan `event` geçiyoruz
+        onChange={(e) => onChange(e.target.value)} // Her zaman value döner
         maxLength={maxLength}
         placeholder={placeholder}
         list={list}
@@ -40,7 +40,6 @@ const InputField = ({
   );
 };
 
-// PropTypes ile validasyon
 InputField.propTypes = {
   label: PropTypes.string,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,

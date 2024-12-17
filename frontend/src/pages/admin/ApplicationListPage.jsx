@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useApplicationStore from "../../store/useApplicationStore";
 import { FcOpenedFolder } from "react-icons/fc";
@@ -6,20 +6,34 @@ import Button from "../../components/Button";
 import ApplicationForm from "../../components/modals/ApplicationFormModal";
 
 const ApplicationListPage = () => {
-  const { applications, isModalOpen, openModal, closeModal } = useApplicationStore();
+  const {
+    applications,
+    fetchApplications, // Tüm başvuruları getirme fonksiyonu
+    isModalOpen,
+    openModal,
+    closeModal,
+  } = useApplicationStore();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState(""); 
+  const [searchQuery, setSearchQuery] = useState("");
 
- 
+  // Sayfa yüklendiğinde başvuruları getirme
+  useEffect(() => {
+    fetchApplications(); // Başvuruları API'den çek
+  }, [fetchApplications]);
+
+  // Arama için filtreleme
   const filteredApplications = applications.filter((item) => {
     const lowerQuery = searchQuery.toLowerCase();
+  
     return (
-      item.name.toLowerCase().includes(lowerQuery) || 
-      (item.category && item.category.toLowerCase().includes(lowerQuery)) || 
-      (item.handler && item.handler.toLowerCase().includes(lowerQuery)) ||
-      (item.lawyer?.name && item.lawyer?.name.toLowerCase().includes(lowerQuery))
+      (item.fullName && item.fullName.toLowerCase().includes(lowerQuery)) || // fullName kontrolü
+      (item.eventCategory && item.eventCategory.toLowerCase().includes(lowerQuery)) || // eventCategory kontrolü
+      (item.processedBy && item.processedBy.toLowerCase().includes(lowerQuery)) || // processedBy kontrolü
+      (item.lawyerId && item.lawyerId.toLowerCase().includes(lowerQuery)) // lawyerId kontrolü
     );
   });
+  
+  
 
   return (
     <div className="rounded-xl flex flex-col items-center p-8 bg-gray-50 min-h-screen">
@@ -35,7 +49,7 @@ const ApplicationListPage = () => {
         <Button
           label="Yeni Kayıt"
           className="bg-amber-400 text-white px-4 py-2 rounded hover:bg-rose-800 transition"
-          onClick={openModal}
+          onClick={openModal} // Modal açılır
         />
       </div>
 
@@ -54,23 +68,24 @@ const ApplicationListPage = () => {
           </div>
 
           {filteredApplications.map((item, index) => (
-            <div
-              key={item.id}
-              className="flex items-center px-6 py-4 hover:bg-gray-50 transition"
-            >
-              <div className="w-20 mr-5 text-center text-gray-800">{index + 1}</div>
-              <div className="mr-5 flex-1 text-gray-800">{item.name}</div>
-              <div className="mr-3 flex-1 text-gray-800">{item.category || "Belirtilmemiş"}</div>
-              <div className="flex-1 text-gray-800">{item.lawyer?.name || "Belirtilmemiş"}</div>
-              <div className="flex-1 text-gray-800">{item.handler || "Belirtilmemiş"}</div>
-              <div className="w-24 flex items-center justify-center gap-2">
-                <Button
-                  label={<FcOpenedFolder size={28} />}
-                  onClick={() => navigate(`/admin-page/application-list/details/${item.id}`)} 
-                />
-              </div>
-            </div>
-          ))}
+  <div key={item._id} className="flex items-center px-6 py-4 hover:bg-gray-50 transition">
+    <div className="w-20 mr-5 text-center text-gray-800">{index + 1}</div>
+    <div className="mr-5 flex-1 text-gray-800">{item.fullName}</div> {/* Ad Soyad */}
+    <div className="mr-3 flex-1 text-gray-800">{item.eventCategory || "Belirtilmemiş"}</div> {/* Hak İhlal Türü */}
+    <div className="flex-1 text-gray-800">{item.lawyerId || "Atanmadı"}</div> {/* Avukat */}
+    <div className="flex-1 text-gray-800">{item.processedBy || "Belirtilmedi"}</div> {/* Başvuruyu Ele Alan */}
+    <div className="w-24 flex items-center justify-center gap-2">
+    <Button
+  label={<FcOpenedFolder size={28} />}
+  onClick={() =>
+    navigate(`/admin-page/application-list/details/${item._id}`)
+  } // update URL'sine yönlendirme yapılıyor
+/>
+
+    </div>
+  </div>
+))}
+
         </div>
       </div>
 
