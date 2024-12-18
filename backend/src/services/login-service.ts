@@ -31,12 +31,12 @@ export const getLawyerByIdService = async (id: string): Promise<IUser | null> =>
   return await User.findOne({ _id: id, role: "lawyer" }); // role: "lawyer" olan ve ID'ye göre kullanıcıyı getir
 };
 
-// Kullanıcı Güncelleme
+// Avukat Güncelleme
 export const updateLawyerService = async (id: string, updates: Partial<IUser>): Promise<IUser | null> => {
   return await User.findByIdAndUpdate(id, updates, { new: true });
 };
 
-// Kullanıcı Silme
+// Avukat Silme
 export const deleteUserService = async (id: string): Promise<IUser | null> => {
   return await User.findByIdAndDelete(id);
 };
