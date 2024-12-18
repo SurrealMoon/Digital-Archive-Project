@@ -50,9 +50,14 @@ const ApplicationDetailsPage = () => {
   // Başvuruyu alan kişi ekleme işlemi
   const handleAssignHandler = () => {
     if (handlerName && formData) {
-      assignHandler(formData.id, handlerName);
+      // Form verisine 'processedBy' alanını ekle
+      setFormData({ processedBy: handlerName });
+  
+      // Güncelleme API çağrısını tetikle
+      updateApplication(formData._id);
+  
       alert(`Başvuruyu alan kişi ${handlerName} olarak eklendi!`);
-      setHandlerName("");
+      setHandlerName(""); // Input'u sıfırla
     } else {
       alert("Lütfen bir isim girin.");
     }

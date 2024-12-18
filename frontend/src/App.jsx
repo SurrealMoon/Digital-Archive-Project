@@ -7,10 +7,7 @@ import ApplicationDetailsPage from "./pages/admin/ApplicationDetailsPage";
 import LawyerListPage from "./pages/admin/LawyerListPage";
 import CaseTrackingPage from "./pages/admin/CaseTrackingListPage";
 import CaseDetailsPage from "./pages/admin/CaseTrackingDetailsPage";
-import MediaScanPage from "./pages/admin/HumanRightsViolationArchive/MediaScanPage";
-import StkDataPage from "./pages/admin/HumanRightsViolationArchive/StkDataPage";
-import BarCommissionsPage from "./pages/admin/HumanRightsViolationArchive/BarCommissionsPage";
-import PublicInstitutionsPage from "./pages/admin/HumanRightsViolationArchive/PublicInstitutionsPage";
+import HumanRightsViolationArchivePage from "./pages/admin/RightsViolationArchivePage";
 
 // ProtectedRoute bileşeni
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -52,11 +49,7 @@ function App() {
           <Route path="case-list/details/:id" element={<CaseDetailsPage />} />
           <Route path="lawyer-list" element={<LawyerListPage />} />
 
-          {/* Hak İhlali İzleme'nin alt sayfaları */}
-          <Route path="rights-violation-archive/media-scan" element={<MediaScanPage />} />
-          <Route path="rights-violation-archive/stk-data" element={<StkDataPage />} />
-          <Route path="rights-violation-archive/bar-commissions" element={<BarCommissionsPage />} />
-          <Route path="rights-violation-archive/public-institutions" element={<PublicInstitutionsPage />} />
+          <Route path="rights-violation-archive" element={<HumanRightsViolationArchivePage />} />
         </Route>
 
         {/* 404 Sayfa Bulunamadı */}

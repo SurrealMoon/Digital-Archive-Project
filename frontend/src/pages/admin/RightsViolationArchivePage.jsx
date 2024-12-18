@@ -1,6 +1,8 @@
 import React from "react";
+import { FcOpenedFolder } from "react-icons/fc";
+import Button from "../../components/Button";
 
-const BarCommissionsPage = () => {
+const HumanRightsViolationArchivePage = () => {
   // Örnek veri
   const listData = [
     { id: 1, period: "Ocak 2023", name: "Ahmet Yılmaz", category: "İnsan Hakları" },
@@ -9,15 +11,19 @@ const BarCommissionsPage = () => {
     { id: 4, period: "Nisan 2023", name: "Ayşe Arslan", category: "İfade Özgürlüğü" },
   ];
 
+  const handleButtonClick = (id) => {
+    alert(`Satır ${id} için işlem yapılıyor!`);
+  };
+
   return (
     <div className="flex flex-col items-center p-8 bg-gray-50 min-h-screen">
-     
-
+      {/* Sayfa Başlığı */}
+  
       {/* Liste Wrapper */}
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Tablo Başlığı */}
         <div className="bg-rose-800 text-white text-sm uppercase font-semibold px-6 py-4">
-         BARO KOMİSYONLARI
+          HAK İHLALLERİ ARŞİV DETAY
         </div>
 
         {/* Liste */}
@@ -27,6 +33,7 @@ const BarCommissionsPage = () => {
             <div className="flex-1">Tarama Dönemi</div>
             <div className="flex-1">Mağdur(lar) Ad-Soyad</div>
             <div className="flex-1">Olay Kategorisi</div>
+            <div className="w-24 text-center">Detay</div>
           </div>
 
           {/* Tablo Satırları */}
@@ -38,6 +45,13 @@ const BarCommissionsPage = () => {
               <div className="flex-1 text-gray-800">{item.period}</div>
               <div className="flex-1 text-gray-800">{item.name}</div>
               <div className="flex-1 text-gray-800">{item.category}</div>
+              <div className="w-24 flex items-center justify-center gap-2">
+                {/* İkon */}
+                <Button
+                  label={<FcOpenedFolder size={28} />}
+                  onClick={() => handleButtonClick(item.id)}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -46,4 +60,4 @@ const BarCommissionsPage = () => {
   );
 };
 
-export default BarCommissionsPage;
+export default HumanRightsViolationArchivePage;

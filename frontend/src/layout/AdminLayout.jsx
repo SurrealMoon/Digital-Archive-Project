@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom'; 
+import { Outlet } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { TbCalendarSearch } from "react-icons/tb";
 import { TbReportSearch } from "react-icons/tb";
@@ -11,7 +11,7 @@ const MainSidebar = () => {
     <div className="bg-amber-50 w-1/6 sm:w-64 h-screen p-4 border-r flex flex-col justify-between">
       <div>
         <div className="text-3xl font-bold mb-10" style={{ color: '#47A7A2' }}>
-          <img src="/src/assets/HitasLogo.png" alt="Logo" className='mr-6'/>
+          <img src="/src/assets/HitasLogo.png" alt="Logo" className='mr-6' />
         </div>
         <ul>
           <li className="mb-4">
@@ -27,36 +27,15 @@ const MainSidebar = () => {
             </Link>
           </li>
 
-          {/* Hak İhlali İzleme Arşiv Dropdown */}
+          {/* Hak İhlali İzleme Arşiv */}
           <li className="relative group">
             <Link to="/admin-page/rights-violation-archive" className="text-gray-700 font-semibold hover:text-rose-800 flex items-center">
               <GiArchiveResearch className="mr-2 size-5" />
               Hak İhlali İzleme Arşiv
             </Link>
-            {/* Dropdown Menu */}
-            <ul className="absolute left-full top-0 hidden group-hover:block bg-white border rounded shadow-lg mt-1">
-              <li className="p-2 hover:bg-gray-100">
-                <Link to="/admin-page/rights-violation-archive/media-scan" className="text-gray-700 hover:text-rose-800">
-                  Medya Taraması
-                </Link>
-              </li>
-              <li className="p-2 hover:bg-gray-100">
-                <Link to="/admin-page/rights-violation-archive/stk-data" className="text-gray-700 hover:text-rose-800">
-                  STK Verileri
-                </Link>
-              </li>
-              <li className="p-2 hover:bg-gray-100">
-                <Link to="/admin-page/rights-violation-archive/bar-commissions" className="text-gray-700 hover:text-rose-800">
-                  Baro Komisyonları
-                </Link>
-              </li>
-              <li className="p-2 hover:bg-gray-100">
-                <Link to="/admin-page/rights-violation-archive/public-institutions" className="text-gray-700 hover:text-rose-800">
-                  Kamu Kurumları
-                </Link>
-              </li>
-            </ul>
           </li>
+
+
           <li className="mt-3">
             <Link to="/admin-page/lawyer-list" className="text-gray-700 font-semibold hover:text-rose-800 flex items-center">
               <BsPersonFillAdd className="mr-1 size-5" />
@@ -68,8 +47,8 @@ const MainSidebar = () => {
 
       {/* Logout Button */}
       <div className="mt-auto">
-        <Link 
-          to="http://localhost:5173/login" 
+        <Link
+          to="http://localhost:5173/login"
           className="block w-1/2 bg-rose-800 text-white font-semibold text-center py-2 rounded hover:bg-rose-600"
         >
           Çıkış Yap

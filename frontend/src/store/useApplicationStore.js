@@ -15,6 +15,7 @@ const useApplicationStore = create((set, get) => ({
     eventDetails: "",     // Olay detayları
     documentTitle: "",    // Döküman başlığı
     documents: [],        // Döküman dosyaları
+    processedBy: "",      // Başvuruyu alan kişi
   },
   isModalOpen: false, // Modal açılma durumu
   error: null, // Hata durumu
@@ -71,20 +72,20 @@ const useApplicationStore = create((set, get) => ({
   updateApplication: async (id) => {
     try {
       const { formData } = get();
-  
+
       // applicationDate'i Date nesnesine dönüştür
       const applicationDate =
         formData.applicationDate instanceof Date
           ? formData.applicationDate
           : new Date(formData.applicationDate);
-  
+
       const payload = {
         ...formData,
         applicationDate: applicationDate.toISOString(), // Date nesnesi garanti
       };
-  
+
       const response = await axiosInstance.put(`/archive/details/${id}`, payload);
-  
+
       set((state) => ({
         applications: state.applications.map((app) =>
           app._id === id ? response.data : app
@@ -98,7 +99,30 @@ const useApplicationStore = create((set, get) => ({
       console.error(error);
     }
   },
-  
+
+  // Başvuruyu alan kişi ekleme
+  assignHandler: async (id, handlerName) => {
+    try {
+      const { formData } = get();
+      const payload = {
+        ...formData,
+        processedBy: handlerName, // Başvuruyu alan kişiyi ekle
+      };
+
+      const response = await axiosInstance.put(`/archive/details/${id}`, payload);
+
+      set((state) => ({
+        applications: state.applications.map((app) =>
+          app._id === id ? response.data : app
+        ),
+        formData: response.data,
+        error: null,
+      }));
+    } catch (error) {
+      set({ error: "Başvuruyu alan kişi eklenirken bir hata oluştu." });
+      console.error(error);
+    }
+  },
 
   // Başvuru silme
   deleteApplication: async (id) => {
@@ -121,15 +145,14 @@ const useApplicationStore = create((set, get) => ({
       if (typeof data === "function") {
         return { formData: { ...state.formData, ...data(state.formData) } };
       }
-  
+
       if (data && typeof data === "object" && !Array.isArray(data)) {
         return { formData: { ...state.formData, ...data } };
       }
-  
+
       console.warn("setFormData: Geçersiz veri formatı", data);
       return state;
     }),
-  
 
   // Tek bir form alanını güncelleme
   updateFormField: (field, value) =>
@@ -151,6 +174,7 @@ const useApplicationStore = create((set, get) => ({
         eventSummary: "",
         eventDetails: "",
         documents: [],
+        processedBy: "", // Başvuruyu alan kişi alanını sıfırla
       },
     }),
 

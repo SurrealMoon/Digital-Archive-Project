@@ -4,10 +4,11 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface ICase extends Document {
   applicationId: mongoose.Types.ObjectId; // Bağlı olduğu başvuru ID'si
   lawyerId?: mongoose.Types.ObjectId; // Davayı takip eden avukat
+  clientname : string // müvekkil ad-soyad 
+  otherlawyer? : string // varsa yetkili diğer avukat 
+  courtName: string; // Mahkeme adı veya CBS
+  courtFileNo: string; // Mahkeme veya savcılık dosya numarası
   caseTitle: string; // Dava başlığı
-  investigationNo?: string; // CBS soruşturma numarası (opsiyonel)
-  courtName: string; // Mahkeme adı
-  courtFileNo: string; // Mahkeme dosya numarası
   caseDescription: string; // Dava açıklaması
   documentTitle?: string; // Döküman başlığı (opsiyonel)
   documents?: string[]; // Yüklenen dosyalar
