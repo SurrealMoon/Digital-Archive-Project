@@ -19,7 +19,7 @@ const ApplicationDetailsPage = () => {
     addApplicationLawyer,
     assignHandler,
   } = useApplicationStore();
-  const lawyers = useLawyerStore((state) => state.lawyers);
+  const { lawyers, fetchLawyers } = useLawyerStore();
   const { openModal } = useArchiveStore();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -30,22 +30,26 @@ const ApplicationDetailsPage = () => {
   // Başvuru detaylarını yükle
   useEffect(() => {
     const fetchData = async () => {
-      await fetchApplicationById(id);
+      await fetchApplicationById(id); // Başvuru detaylarını getir
+      await fetchLawyers(); // Avukat listesini çek
       setLoading(false);
     };
     fetchData();
-  }, [id, fetchApplicationById]);
+  }, [id, fetchApplicationById, fetchLawyers]);
+  
 
   // Avukat ekleme işlemi
   const handleAddLawyer = () => {
-    if (selectedLawyer && formData) {
-      addApplicationLawyer(formData.id, selectedLawyer);
-      alert(`Avukat ${selectedLawyer.name} başarıyla eklendi!`);
-      setSelectedLawyer(null);
+    if (selectedLawyer) {
+      addApplicationLawyer(formData._id, selectedLawyer); // Başvuru ve avukat ID'si gönderiliyor
+      alert(`Avukat başarıyla atandı!`);
+      setSelectedLawyer(""); // Seçimi sıfırla
     } else {
       alert("Lütfen bir avukat seçin.");
     }
   };
+  
+  
 
   // Başvuruyu alan kişi ekleme işlemi
   const handleAssignHandler = () => {
@@ -157,25 +161,29 @@ const ApplicationDetailsPage = () => {
           </div>
 
           <div className="mt-6 w-full flex space-x-4">
+            
             {/* Avukat Ekleme */}
             <div className="flex-1">
-              <Dropdown
-                label="Avukat Seç"
-                options={lawyers.map((lawyer) => lawyer.name)}
-                selected={selectedLawyer}
-                onChange={(name) => {
-                  const selected = lawyers.find((lawyer) => lawyer.name === name);
-                  setSelectedLawyer(selected);
-                }}
-              />
+              <label className="block mb-1 text-gray-800">Avukat Seç</label>
+              <select
+                value={selectedLawyer || ""}
+                onChange={(e) => setSelectedLawyer(e.target.value)}
+                className="w-full px-4 py-2 border rounded focus:ring focus:ring-blue-300"
+              >
+                <option value="">Seç</option>
+                {lawyers.map((lawyer) => (
+                  <option key={lawyer._id} value={lawyer._id}>
+                    {lawyer.fullName} - {lawyer.baroSicilNo}
+                  </option>
+                ))}
+              </select>
               <button
                 onClick={handleAddLawyer}
-                className="w-full mt-1 bg-amber-400 text-white px-4 py-2 rounded hover:bg-rose-800 transition"
+                className="w-full mt-7 bg-amber-400 text-white px-4 py-2 rounded hover:bg-rose-800 transition"
               >
                 Avukat Ekle
               </button>
             </div>
-
             {/* Başvuruyu Alan Kişi */}
             <div className="flex-1">
               <label htmlFor="handlerName" className="block mb-1 text-gray-800">

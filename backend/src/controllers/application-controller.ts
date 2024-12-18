@@ -88,19 +88,31 @@ export const deleteApplication: RequestHandler = async (req, res, next) => {
 // Avukat Atama
 export const assignLawyer: RequestHandler = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { avukatId } = req.body;
-    const updatedApplication = await assignLawyerService(id, avukatId);
+    const { id } = req.params; // Başvuru ID
+    const { lawyerId } = req.body; // Avukat ID (frontend'den gelen)
+
+    // Eğer lawyerId veya id eksikse hata döndür
+    if (!id || !lawyerId) {
+      res.status(400).json({ message: "Application ID and Lawyer ID are required" });
+      return;
+    }
+
+    // Servis fonksiyonuna yönlendir
+    const updatedApplication = await assignLawyerService(id, lawyerId);
 
     if (!updatedApplication) {
       res.status(404).json({ message: "Application not found" });
       return;
     }
 
-    res.status(200).json(updatedApplication);
-    return;
+    // Güncellenmiş başvuru döndür
+    res.status(200).json({
+      message: "Lawyer assigned successfully",
+      application: updatedApplication,
+    });
   } catch (error) {
-    next(error);
+    console.error("Error assigning lawyer:", error);
+    next(error); // Hata işleme middleware'ine gönder
   }
 };
 

@@ -23,7 +23,7 @@ const useApplicationStore = create((set, get) => ({
   // Tüm başvuruları getirme
   fetchApplications: async () => {
     try {
-      const response = await axiosInstance.get("/archive/application-list");
+      const response = await axiosInstance.get("/applications/application-list");
       set({ applications: response.data, error: null });
       console.log("Başvurular:", response.data); // Debug logu
     } catch (error) {
@@ -35,7 +35,7 @@ const useApplicationStore = create((set, get) => ({
   // Belirli bir başvuru detaylarını getirme
   fetchApplicationById: async (id) => {
     try {
-      const response = await axiosInstance.get(`/archive/${id}`);
+      const response = await axiosInstance.get(`/applications/${id}`);
       set({ formData: response.data, error: null });
       console.log("Detaylı Başvuru Verisi:", response.data);
     } catch (error) {
@@ -43,6 +43,30 @@ const useApplicationStore = create((set, get) => ({
       console.error(error);
     }
   },
+
+   // Başvuruya avukat atama
+   addApplicationLawyer: async (applicationId, lawyerId) => {
+    try {
+      const response = await axiosInstance.put(
+        `/applications/${applicationId}/assign-lawyer`, // API endpoint
+        { lawyerId } // Gönderilen body: { lawyerId }
+      );
+  
+      // Başvuru durumunu güncelle
+      set((state) => ({
+        applications: state.applications.map((app) =>
+          app._id === applicationId ? response.data.application : app
+        ),
+        formData: response.data.application, // Güncellenen başvuruyu kaydet
+        error: null,
+      }));
+  
+      console.log(`Başvuruya avukat atandı: ${response.data}`);
+    } catch (error) {
+      set({ error: "Avukat atama işlemi sırasında bir hata oluştu." });
+      console.error(error);
+    }
+  },  
 
   // Yeni başvuru oluşturma
   addApplication: async () => {
@@ -54,7 +78,7 @@ const useApplicationStore = create((set, get) => ({
       };
       console.log("Gönderilen Payload:", payload);
 
-      const response = await axiosInstance.post("/archive/create", payload);
+      const response = await axiosInstance.post("/applications/create", payload);
 
       set((state) => ({
         applications: [...state.applications, response.data],
@@ -84,7 +108,7 @@ const useApplicationStore = create((set, get) => ({
         applicationDate: applicationDate.toISOString(), // Date nesnesi garanti
       };
 
-      const response = await axiosInstance.put(`/archive/details/${id}`, payload);
+      const response = await axiosInstance.put(`/applications/details/${id}`, payload);
 
       set((state) => ({
         applications: state.applications.map((app) =>
@@ -109,7 +133,7 @@ const useApplicationStore = create((set, get) => ({
         processedBy: handlerName, // Başvuruyu alan kişiyi ekle
       };
 
-      const response = await axiosInstance.put(`/archive/details/${id}`, payload);
+      const response = await axiosInstance.put(`/applications/details/${id}`, payload);
 
       set((state) => ({
         applications: state.applications.map((app) =>
@@ -127,7 +151,7 @@ const useApplicationStore = create((set, get) => ({
   // Başvuru silme
   deleteApplication: async (id) => {
     try {
-      await axiosInstance.delete(`/archive/${id}`);
+      await axiosInstance.delete(`/applications/${id}`);
       set((state) => ({
         applications: state.applications.filter((app) => app._id !== id),
         error: null,

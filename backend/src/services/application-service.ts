@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Application, { IApplication } from "../models/application-model";
 
 // Yeni Başvuru Oluşturma
@@ -40,11 +41,26 @@ export const assignLawyerService = async (
   applicationId: string,
   lawyerId: string
 ): Promise<IApplication | null> => {
-  return await Application.findByIdAndUpdate(
+  // Geçerli ID kontrolü
+  if (!mongoose.isValidObjectId(applicationId) || !mongoose.isValidObjectId(lawyerId)) {
+    throw new Error("Invalid applicationId or lawyerId");
+  }
+
+  // lawyerId'yi ObjectId formatına dönüştür
+  const lawyerObjectId = new mongoose.Types.ObjectId(lawyerId);
+
+  // Güncelleme işlemi
+  const updatedApplication = await Application.findByIdAndUpdate(
     applicationId,
-    { avukatId: lawyerId },
+    { lawyerId: lawyerObjectId }, // Modeldeki alan adı
     { new: true }
   );
+
+  if (!updatedApplication) {
+    throw new Error("Application not found");
+  }
+
+  return updatedApplication;
 };
 
 // Hak İhlali Ekleme

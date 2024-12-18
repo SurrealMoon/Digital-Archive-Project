@@ -40,7 +40,7 @@ const connectDB = async () => {
 
 // Routes
 app.use('/api/users', adminRoutes); // Admin işlemleri için rotalar
-app.use('/api/archive', applicationRoutes); // Başvuru işlemleri
+app.use('/api/applications', applicationRoutes); // Başvuru işlemleri
 app.use('/api/violations', violationRoutes); // Hak ihlali işlemleri
 app.use("/api/cases", caseRoutes); // Dava işlemleri rotaları
 
