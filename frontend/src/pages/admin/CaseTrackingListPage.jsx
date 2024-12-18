@@ -10,13 +10,13 @@ const CaseTrackingListPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredCases = cases.filter((item) => {
-    const lowerQuery = searchQuery.toLowerCase();
+    const lowerQuery = searchQuery.toLowerCase('tr');
 
     return (
-      (item.name && item.name.toLowerCase().includes(lowerQuery)) || // name kontrolü
-      (item.category && item.category.toLowerCase().includes(lowerQuery)) || // category kontrolü
-      (item.courtName && item.courtName.toLowerCase().includes(lowerQuery)) || // courtName kontrolü
-      (item.lawyer?.name && item.lawyer.name.toLowerCase().includes(lowerQuery)) // lawyer.name kontrolü
+      (item.name && item.name.toLowerCase('tr').includes(lowerQuery)) || // name kontrolü
+      (item.category && item.category.toLowerCase('tr').includes(lowerQuery)) || // category kontrolü
+      (item.courtName && item.courtName.toLowerCase('tr').includes(lowerQuery)) || // courtName kontrolü
+      (item.lawyer?.name && item.lawyer.name.toLowerCase('tr').includes(lowerQuery)) // lawyer.name kontrolü
     );
   });
 

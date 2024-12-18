@@ -23,13 +23,13 @@ const ApplicationListPage = () => {
 
   // Arama için filtreleme
   const filteredApplications = applications.filter((item) => {
-    const lowerQuery = searchQuery.toLowerCase();
+    const lowerQuery = searchQuery.toLowerCase('tr');
   
     return (
-      (item.fullName && item.fullName.toLowerCase().includes(lowerQuery)) || // fullName kontrolü
-      (item.eventCategory && item.eventCategory.toLowerCase().includes(lowerQuery)) || // eventCategory kontrolü
-      (item.processedBy && item.processedBy.toLowerCase().includes(lowerQuery)) || // processedBy kontrolü
-      (item.lawyerId && item.lawyerId.toLowerCase().includes(lowerQuery)) // lawyerId kontrolü
+      (item.fullName && item.fullName.toLowerCase('tr').includes(lowerQuery)) || // fullName kontrolü
+      (item.eventCategory && item.eventCategory.toLowerCase('tr').includes(lowerQuery)) || // eventCategory kontrolü
+      (item.processedBy && item.processedBy.toLowerCase('tr').includes(lowerQuery)) || // processedBy kontrolü
+      (item.lawyerId && item.lawyerId.toLowerCase('tr').includes(lowerQuery)) // lawyerId kontrolü
     );
   });
   
