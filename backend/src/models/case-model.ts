@@ -19,13 +19,15 @@ const CaseSchema: Schema = new Schema(
   {
     applicationId: { type: mongoose.Schema.Types.ObjectId, ref: "Application", required: true }, // Application ile bağlantı
     lawyerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Sistemde kayıtlı bir avukat
-    caseTitle: { type: String, required: true, unique: true },
-    investigationNo: { type: String }, // Opsiyonel
-    courtName: { type: String, required: true },
-    courtFileNo: { type: String, required: true, unique: true },
-    caseDescription: { type: String, required: true },
-    documentTitle: { type: String },
-    documents: { type: [String] }, // Dökümanları bir dizi olarak tutar
+    clientname: { type: String }, // Müvekkil adı-soyadı
+    otherlawyer: { type: String }, // Opsiyonel, varsa diğer avukat
+    caseTitle: { type: String}, // Dava başlığı
+    courtName: { type: String}, // Mahkeme adı veya CBS
+    courtFileNo: { type: String}, // Mahkeme dosya numarası
+    caseDescription: { type: String }, // Dava açıklaması
+    documentTitle: { type: String }, // Döküman başlığı (opsiyonel)
+    documents: { type: [String] }, // Yüklenen dosyaların dizisi
+    investigationNo: { type: String }, // Opsiyonel, soruşturma numarası
   },
   { timestamps: true } // createdAt ve updatedAt otomatik olarak eklenir
 );

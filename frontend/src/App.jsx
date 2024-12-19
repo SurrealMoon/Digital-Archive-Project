@@ -49,6 +49,15 @@ function App() {
             }
           />
           <Route
+            path="application-list/details/:id"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <ApplicationDetailsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="case-list"
             element={
               <ProtectedRoute requiredRole="admin">
@@ -56,6 +65,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="lawyer-list"
             element={
@@ -64,6 +74,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="rights-violation-archive"
             element={
@@ -74,6 +85,16 @@ function App() {
           />
 
           {/* Avukat için rotalar */}
+
+          <Route
+            path="case-list"
+            element={
+              <ProtectedRoute requiredRole="lawyer">
+                <CaseDetailsPage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="case-list/details/:id"
             element={
