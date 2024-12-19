@@ -27,13 +27,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Ana sayfa - yönlendirme */}
-        <Route path="/" element={<Navigate to="/login" />} />
-
         {/* Ana giriş ekranı */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Admin layout ile iç içe rotalar */}
+        {/* Admin ve Avukat rolleri için Protected Route */}
         <Route
           path="/admin-page"
           element={
@@ -42,14 +39,49 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* Admin sayfaları */}
-          <Route path="application-list" element={<ApplicationPage />} />
-          <Route path="application-list/details/:id" element={<ApplicationDetailsPage />} />
-          <Route path="case-list" element={<CaseTrackingPage />} />
-          <Route path="case-list/details/:id" element={<CaseDetailsPage />} />
-          <Route path="lawyer-list" element={<LawyerListPage />} />
+          {/* Admin için rotalar */}
+          <Route
+            path="application-list"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <ApplicationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="case-list"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <CaseTrackingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="lawyer-list"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <LawyerListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="rights-violation-archive"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <HumanRightsViolationArchivePage />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="rights-violation-archive" element={<HumanRightsViolationArchivePage />} />
+          {/* Avukat için rotalar */}
+          <Route
+            path="case-list/details/:id"
+            element={
+              <ProtectedRoute requiredRole="lawyer">
+                <CaseDetailsPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* 404 Sayfa Bulunamadı */}

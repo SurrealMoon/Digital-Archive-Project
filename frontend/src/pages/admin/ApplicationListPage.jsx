@@ -72,7 +72,7 @@ const ApplicationListPage = () => {
     <div className="w-20 mr-5 text-center text-gray-800">{index + 1}</div>
     <div className="mr-5 flex-1 text-gray-800">{item.fullName}</div> {/* Ad Soyad */}
     <div className="mr-3 flex-1 text-gray-800">{item.eventCategory || "Belirtilmemiş"}</div> {/* Hak İhlal Türü */}
-    <div className="flex-1 text-gray-800">{item.lawyerId || "Atanmadı"}</div> {/* Avukat */}
+    <div className="flex-1 text-gray-800">{item.lawyerId?.fullName || "Atanmadı"}</div> {/* Avukat */}
     <div className="flex-1 text-gray-800">{item.processedBy || "Belirtilmedi"}</div> {/* Başvuruyu Ele Alan */}
     <div className="w-24 flex items-center justify-center gap-2">
     <Button

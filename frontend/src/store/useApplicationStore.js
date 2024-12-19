@@ -25,7 +25,7 @@ const useApplicationStore = create((set, get) => ({
     try {
       const response = await axiosInstance.get("/applications/application-list");
       set({ applications: response.data, error: null });
-      console.log("Başvurular:", response.data); // Debug logu
+      console.log("Başvurular:", response.data); 
     } catch (error) {
       set({ error: "Başvurular alınamadı." });
       console.error(error);

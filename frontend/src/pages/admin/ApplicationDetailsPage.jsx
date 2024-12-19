@@ -173,8 +173,8 @@ const ApplicationDetailsPage = () => {
                 <option value="">Seç</option>
                 {lawyers.map((lawyer) => (
                   <option key={lawyer._id} value={lawyer._id}>
-                    {lawyer.fullName} - {lawyer.baroSicilNo}
-                  </option>
+                  {lawyer.fullName}
+                </option>
                 ))}
               </select>
               <button
