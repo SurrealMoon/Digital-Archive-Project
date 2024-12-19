@@ -13,10 +13,15 @@ export interface IApplication extends Document {
   eventSummary: string; // Olay başlığı
   eventDetails: string; // Olayın detayları
   documentTitle?: string; // Döküman başlığı
-  documents?: string[]; // Dökümanlar (dosya yolları)
+  documents?: {
+    fileUrl: string;
+    documentTitle: string;
+    uploadedAt: Date;
+  }[]; // Nesne listesi burada inline tanımlı
   processedBy?: string; // Başvuruyu düzenleyen baro personelinin adı
   lawyerId?: mongoose.Types.ObjectId; // Atanan avukatın referansı
 }
+
 
 // Başvuru Şeması
 const ApplicationSchema: Schema = new Schema(
@@ -32,9 +37,19 @@ const ApplicationSchema: Schema = new Schema(
     eventSummary: { type: String, required: true }, // Olay özeti
     eventDetails: { type: String, required: true }, // Olay detayları
     documentTitle: { type: String }, // Döküman başlığı
-    documents: { type: [String] }, // Dökümanlar (dosya yolları)
+    documents: {
+      type: [
+        {
+          fileUrl: { type: String, required: true },
+          documentTitle: { type: String, required: true },
+          uploadedAt: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
     processedBy: { type: String }, // İşlem yapan baro personelinin adı
     lawyerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Atanan avukat referansı
+    caseId: { type: mongoose.Schema.Types.ObjectId, ref: "Case" },
   },
   { timestamps: true } // createdAt ve updatedAt otomatik eklenir
 );

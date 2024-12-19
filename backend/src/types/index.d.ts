@@ -1,9 +1,9 @@
-import { Document } from 'mongoose'; // Mongoose belgesi için tür
+import { File } from 'multer';
 
 declare global {
   namespace Express {
     interface Request {
-      user?: Document | null; // Mongoose Document türü
+      file?: File & { location?: string };
     }
   }
 }

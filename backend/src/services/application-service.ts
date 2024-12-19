@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Application, { IApplication } from "../models/application-model";
+import User from "../models/user-model";
 
 // Yeni Başvuru Oluşturma
 export const createApplicationService = async (
@@ -10,8 +11,14 @@ export const createApplicationService = async (
 };
 
 // Tüm Başvuruları Listeleme
+// Tüm Başvuruları Listeleme
 export const getAllApplicationsService = async (): Promise<IApplication[]> => {
-  return await Application.find();
+  return await Application.find()
+    .populate({
+      path: "lawyerId", // lawyerId alanını ilişkilendiriyoruz
+      model : User, // User modelinden veri çekiyoruz
+      select: "fullName email phone", // Döndürülecek alanlar
+    });
 };
 
 // Belirli Bir Başvuruyu Getirme
@@ -77,4 +84,35 @@ export const addViolationService = async (
   );
 
   return updated;
+};
+
+export const addDocumentToApplication = async (
+  applicationId: string,
+  fileUrl: string,
+  documentTitle: string
+) => {
+  // Başvuru belgesini veritabanından al
+  const application = await Application.findById(applicationId);
+
+  if (!application) {
+    throw new Error('Application not found'); // Başvuru bulunamazsa hata fırlat
+  }
+
+  // Eklemek istediğiniz doküman
+  const newDocument = {
+    fileUrl,
+    documentTitle,
+    uploadedAt: new Date(),
+  };
+
+  // Başvurunun documents alanına dokümanı ekle
+  if (!Array.isArray(application.documents)) {
+    throw new Error('Invalid application documents structure');
+  }
+
+  application.documents.push(newDocument);
+
+  // Güncellenmiş başvuruyu kaydet ve döndür
+  const updatedApplication = await application.save();
+  return updatedApplication;
 };

@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import { RequestHandler, Request, Response, NextFunction } from 'express';
 import {
   createApplicationService,
   getAllApplicationsService,
@@ -7,7 +7,14 @@ import {
   deleteApplicationService,
   assignLawyerService,
   addViolationService,
+  addDocumentToApplication,
 } from "../services/application-service";
+import FileService from '../services/upload-service';
+
+interface MulterRequest extends Request {
+  file?: Express.Multer.File & { location?: string };
+}
+
 
 // Yeni Başvuru Oluşturma
 export const createApplication: RequestHandler = async (req, res, next) => {
@@ -135,3 +142,49 @@ export const addViolation: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const addDocumentController = async (
+  req: MulterRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { documentTitle } = req.body;
+
+    if (!req.file) {
+      res.status(400).json({ message: 'No file uploaded' });
+      return;
+    }
+
+    // AWS S3'e dosya yükle
+    let fileUrl: string;
+    try {
+      const uploadResult = await FileService.uploadFile(req.file);
+      fileUrl = uploadResult.Location;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("S3 upload error:", error.message);
+        res.status(500).json({ message: 'File upload failed', error: error.message });
+      } else {
+        console.error("S3 upload error:", error);
+        res.status(500).json({ message: 'File upload failed', error: 'An unknown error occurred' });
+      }
+      return;
+    }
+
+    // Dosyayı başvuruya ekle
+    const updatedApplication = await addDocumentToApplication(id, fileUrl, documentTitle);
+
+    if (!updatedApplication) {
+      res.status(404).json({ message: 'Application not found' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Document added successfully', updatedApplication });
+  } catch (error) {
+    next(error);
+  }
+};
+

@@ -8,6 +8,8 @@ import { protect } from './middlewares/auth-middleware'; // Token doğrulama mid
 import applicationRoutes from "./routes/application-routes";
 import violationRoutes from "./routes/violation-routes";
 import caseRoutes from "./routes/case-routes"; // Dava rotalarını ekle
+import uploadRoute from './routes/upload-routes';
+
 
 dotenv.config();
 
@@ -43,6 +45,8 @@ app.use('/api/users', adminRoutes); // Admin işlemleri için rotalar
 app.use('/api/applications', applicationRoutes); // Başvuru işlemleri
 app.use('/api/violations', violationRoutes); // Hak ihlali işlemleri
 app.use("/api/cases", caseRoutes); // Dava işlemleri rotaları
+app.use('/api', uploadRoute); // Dosya yükleme rotası
+
 
 // Protected Test Route (middleware testi için)
 app.get('/api/protected', protect, (req, res) => {
