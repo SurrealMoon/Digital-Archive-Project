@@ -22,24 +22,22 @@ class FileService {
       if (!this.BUCKET_NAME) {
         throw new Error('Bucket name is not defined in the environment variables');
       }
-  
+
       const params = {
-        Bucket: this.BUCKET_NAME, // Bucket adı çevre değişkeninden alınıyor
+        Bucket: this.BUCKET_NAME,
         Key: file.originalname,
         Body: file.buffer,
         ContentType: file.mimetype,
       };
-  
-      console.log('Uploading file with params:', params); // Debugging için log ekleyin
-  
+
+      console.log('Uploading file with params:', params);
+
       return this.s3.upload(params).promise();
     } catch (error) {
-      console.error('S3 upload error:', error); // Hata detaylarını loglayın
+      console.error('S3 upload error:', error);
       throw new Error('File upload failed');
     }
   }
-  
-  
 
   async getFile(key: string): Promise<AWS.S3.GetObjectOutput> {
     const params = {

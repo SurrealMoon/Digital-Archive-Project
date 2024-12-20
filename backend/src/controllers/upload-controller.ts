@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { uploadFileToS3 } from '../services/upload-service';
+import fileService from '../services/upload-service';
 import { addDocumentToApplication } from '../services/application-service';
 
 interface MulterRequest extends Request {
@@ -16,8 +16,11 @@ export const addDocumentController = async (
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const fileUrl = await uploadFileToS3(req.file); // Servis katmanından çağrı
+    // S3'e dosya yükleme
+    const uploadResult = await fileService.uploadFile(req.file); // FileService örneği üzerinden çağrı
+    const fileUrl = uploadResult.Location; // S3'ten dönen URL
 
+    // Başvuruya belge ekleme
     const updatedApplication = await addDocumentToApplication(
       req.params.id,
       fileUrl,
