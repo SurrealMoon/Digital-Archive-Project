@@ -14,45 +14,45 @@ const ApplicationEditModal = ({ application, isOpen, onClose }) => {
     resetFormData,
     removeDocumentFromApplication,
     updateApplication,
+    addDocumentToApplication, // Dosya yükleme fonksiyonu
   } = useApplicationStore();
 
   // Modal ilk açıldığında form verisini doldur
-    // Modal ilk açıldığında form verisini doldur
-    useEffect(() => {
-      if (isOpen && application) {
-        setFormData({
-          fullName: application.fullName || "",
-          citizenId: application.citizenId || "",
-          phone: application.phone || "",
-          email: application.email || "",
-          address: application.address || "",
-          applicationDate: application.applicationDate
-            ? new Date(application.applicationDate)
-            : new Date(),
-          eventCategory: application.eventCategory || "",
-          eventSummary: application.eventSummary || "",
-          eventDetails: application.eventDetails || "",
-          documents: application.documents || [], // Belgeleri de al
-        });
-      }
-      // Modal kapanırken formu sıfırla
-      if (!isOpen) resetFormData();
-    }, [isOpen]); // Bağımlılık olarak sadece isOpen kullanıldı.
+  useEffect(() => {
+    if (isOpen && application) {
+      setFormData({
+        fullName: application.fullName || "",
+        citizenId: application.citizenId || "",
+        phone: application.phone || "",
+        email: application.email || "",
+        address: application.address || "",
+        applicationDate: application.applicationDate
+          ? new Date(application.applicationDate)
+          : new Date(),
+        eventCategory: application.eventCategory || "",
+        eventSummary: application.eventSummary || "",
+        eventDetails: application.eventDetails || "",
+        documents: application.documents || [], // Belgeleri de al
+      });
+    }
+    // Modal kapanırken formu sıfırla
+    if (!isOpen) resetFormData();
+  }, [isOpen]); // Bağımlılık olarak sadece isOpen kullanıldı.
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
   };
 
   const handleFileChange = (files) => {
-    const updatedFiles = [
-      ...formData.documents,
-      ...Array.from(files).map((file) => ({
-        fileUrl: URL.createObjectURL(file), // Geçici URL
-        documentTitle: file.name, // Dosya adı başlık olarak
-        uploadedAt: new Date(), // Yükleme tarihi
-      })),
-    ];
-    setFormData({ documents: updatedFiles });
+    Array.from(files).forEach((file) => {
+      addDocumentToApplication(application._id, file, file.name)
+        .then(() => {
+          console.log("Dosya başarıyla yüklendi:", file.name);
+        })
+        .catch((error) => {
+          console.error("Dosya yükleme hatası:", error);
+        });
+    });
   };
 
   const handleRemoveFile = async (index) => {

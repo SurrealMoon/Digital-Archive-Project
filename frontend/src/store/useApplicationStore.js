@@ -85,14 +85,20 @@ const useApplicationStore = create((set, get) => ({
       const formData = new FormData();
       formData.append("file", file);
       formData.append("documentTitle", documentTitle);
-
+  
       const response = await axiosInstance.post(
         `/applications/${applicationId}/upload`,
-        formData
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // FormData için gerekli header
+          },
+        }
       );
-
+  
       const { fileUrl } = response.data;
-
+  
+      // Store'daki veriyi güncelle
       set((state) => ({
         formData: {
           ...state.formData,
@@ -103,19 +109,19 @@ const useApplicationStore = create((set, get) => ({
         },
         error: null,
       }));
-
-      console.log("Belge başarıyla eklendi:", fileUrl);
+  
+      console.log("Dosya başarıyla yüklendi:", fileUrl);
     } catch (error) {
-      set({ error: "Belge eklenirken bir hata oluştu." });
+      set({ error: "Dosya yükleme sırasında bir hata oluştu." });
       console.error(error);
     }
   },
 
   // Başvurudan belge silme
-removeDocumentFromApplication: async (applicationId, documentIndex) => {
+removeDocumentFromApplication: async (applicationId, index) => {
   try {
     const response = await axiosInstance.delete(
-      `/applications/${applicationId}/documents/${documentIndex}`
+      `/applications/${applicationId}/documents/${index}`
     );
 
     const updatedDocuments = response.data.documents; // Güncellenmiş döküman listesi

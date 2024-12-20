@@ -91,12 +91,16 @@ export const addDocumentToApplication = async (
   fileUrl: string,
   documentTitle: string
 ) => {
+
   // Başvuru belgesini veritabanından al
   const application = await Application.findById(applicationId);
 
   if (!application) {
+    console.error("Application not found for ID:", applicationId);
     throw new Error('Application not found'); // Başvuru bulunamazsa hata fırlat
   }
+
+  console.log("Application found:", application);
 
   // Eklemek istediğiniz doküman
   const newDocument = {
@@ -107,15 +111,21 @@ export const addDocumentToApplication = async (
 
   // Başvurunun documents alanına dokümanı ekle
   if (!Array.isArray(application.documents)) {
+    console.error("Invalid documents structure in application:", application.documents);
     throw new Error('Invalid application documents structure');
   }
+
+  console.log("Adding new document:", newDocument);
 
   application.documents.push(newDocument);
 
   // Güncellenmiş başvuruyu kaydet ve döndür
   const updatedApplication = await application.save();
+  console.log("Updated application successfully:", updatedApplication);
+
   return updatedApplication;
 };
+
 
 export const removeDocumentFromApplication = async (
   applicationId: string,

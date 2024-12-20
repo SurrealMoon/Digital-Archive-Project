@@ -151,6 +151,7 @@ export const addDocumentController = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    
     const { id } = req.params;
     const { documentTitle } = req.body;
 
@@ -165,13 +166,8 @@ export const addDocumentController = async (
       const uploadResult = await FileService.uploadFile(req.file);
       fileUrl = uploadResult.Location;
     } catch (error) {
-      if (error instanceof Error) {
-        console.error("S3 upload error:", error.message);
-        res.status(500).json({ message: 'File upload failed', error: error.message });
-      } else {
-        console.error("S3 upload error:", error);
-        res.status(500).json({ message: 'File upload failed', error: 'An unknown error occurred' });
-      }
+      console.error("S3 upload error:", error);
+      res.status(500).json({ message: 'File upload failed', error });
       return;
     }
 
@@ -188,6 +184,7 @@ export const addDocumentController = async (
     next(error);
   }
 };
+
 
 export const removeDocumentController = async (
   req: Request<{ id: string; index: string }, {}, {}, {}>, // Parametreler doğru şekilde tipli
