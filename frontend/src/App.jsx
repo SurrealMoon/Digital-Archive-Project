@@ -27,85 +27,47 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Ana giriş ekranı */}
+        {/* Login */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Admin ve Avukat rolleri için Protected Route */}
+        {/* Admin ve Avukat rolleri için korumalı alan */}
         <Route
           path="/admin-page"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminLayoutPage />
             </ProtectedRoute>
           }
         >
           {/* Admin için rotalar */}
-          <Route
-            path="application-list"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <ApplicationPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="application-list/details/:id"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <ApplicationDetailsPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="case-list"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <CaseTrackingPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="lawyer-list"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <LawyerListPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="rights-violation-archive"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <HumanRightsViolationArchivePage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Avukat için rotalar */}
-
-          <Route
-            path="case-list"
-            element={
-              <ProtectedRoute requiredRole="lawyer">
-                <CaseDetailsPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="case-list/details/:id"
-            element={
-              <ProtectedRoute requiredRole="lawyer">
-                <CaseDetailsPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="application-list" element={<ApplicationPage />} />
+          <Route path="application-list/details/:id" element={<ApplicationDetailsPage />} />
+          <Route path="case-list" element={<CaseTrackingPage />} />
+          <Route path="lawyer-list" element={<LawyerListPage />} />
+          <Route path="rights-violation-archive" element={<HumanRightsViolationArchivePage />} />
         </Route>
 
-        {/* 404 Sayfa Bulunamadı */}
+        {/* Avukat için rotalar */}
+        <Route
+          path="/lawyer-page"
+          element={
+            <ProtectedRoute allowedRoles={["lawyer"]}>
+              <CaseDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Unauthorized Page */}
+        <Route
+          path="/unauthorized"
+          element={
+            <div className="h-screen flex items-center justify-center text-2xl text-red-600">
+              Yetkisiz Erişim
+            </div>
+          }
+        />
+
+        {/* 404 Page */}
         <Route
           path="*"
           element={

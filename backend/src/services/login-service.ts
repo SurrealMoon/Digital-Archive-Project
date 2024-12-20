@@ -79,3 +79,20 @@ export const refreshAccessTokenService = async (refreshToken: string): Promise<s
 
   return generateToken(user._id.toString());
 };
+
+export const verifyTokenService = async (token: string) => {
+  if (!token) {
+    throw new Error("Token gerekli");
+  }
+
+  try {
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "defaultsecret");
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      throw new Error("Kullanıcı bulunamadı");
+    }
+    return user;
+  } catch (error) {
+    throw new Error("Geçersiz token");
+  }
+};

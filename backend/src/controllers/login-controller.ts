@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import User from "../models/user-model"; 
 import { generateToken, generateRefreshToken } from "../utils/generateToken";
 import {
@@ -10,7 +10,8 @@ import {
   getLawyerByIdService,
   updateRefreshTokenService,
   clearRefreshTokenService,
-  refreshAccessTokenService
+  refreshAccessTokenService,
+  verifyTokenService,
 } from "../services/login-service";
 
 // Admin Giriş İşlemi
@@ -231,3 +232,20 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
+;
+
+export const verifyTokenController: RequestHandler = async (req, res, next): Promise<void> => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1]; // "Bearer <token>" formatında gelir
+    if (!token) {
+      res.status(401).json({ message: "Token gerekli" });
+      return;
+    }
+
+    const user = await verifyTokenService(token);
+    res.status(200).json({ user }); // Kullanıcı bilgilerini döndür
+  } catch (error) {
+    next(error);
+  }
+};
+
