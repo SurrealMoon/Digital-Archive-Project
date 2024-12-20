@@ -7,30 +7,37 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useApplicationStore from "../../store/useApplicationStore";
 
-const ApplicationEditModal = ({ application, isOpen, onClose, onSubmit }) => {
-  const { formData, setFormData, resetFormData } = useApplicationStore();
+const ApplicationEditModal = ({ application, isOpen, onClose }) => {
+  const {
+    formData,
+    setFormData,
+    resetFormData,
+    removeDocumentFromApplication,
+    updateApplication,
+  } = useApplicationStore();
 
   // Modal ilk açıldığında form verisini doldur
-  useEffect(() => {
-    if (isOpen && application) {
-      setFormData({
-        fullName: application.fullName || "",
-        citizenId: application.citizenId || "",
-        phone: application.phone || "",
-        email: application.email || "",
-        address: application.address || "",
-        applicationDate: application.applicationDate
-          ? new Date(application.applicationDate)
-          : new Date(),
-        eventCategory: application.eventCategory || "",
-        eventSummary: application.eventSummary || "",
-        eventDetails: application.eventDetails || "",
-        documents: application.documents || [],
-      });
-    }
-    // Modal kapanırken formu sıfırla
-    if (!isOpen) resetFormData();
-  }, [isOpen]); // Bağımlılık olarak sadece isOpen kullanıldı.
+    // Modal ilk açıldığında form verisini doldur
+    useEffect(() => {
+      if (isOpen && application) {
+        setFormData({
+          fullName: application.fullName || "",
+          citizenId: application.citizenId || "",
+          phone: application.phone || "",
+          email: application.email || "",
+          address: application.address || "",
+          applicationDate: application.applicationDate
+            ? new Date(application.applicationDate)
+            : new Date(),
+          eventCategory: application.eventCategory || "",
+          eventSummary: application.eventSummary || "",
+          eventDetails: application.eventDetails || "",
+          documents: application.documents || [], // Belgeleri de al
+        });
+      }
+      // Modal kapanırken formu sıfırla
+      if (!isOpen) resetFormData();
+    }, [isOpen]); // Bağımlılık olarak sadece isOpen kullanıldı.
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
@@ -39,14 +46,36 @@ const ApplicationEditModal = ({ application, isOpen, onClose, onSubmit }) => {
   const handleFileChange = (files) => {
     const updatedFiles = [
       ...formData.documents,
-      ...Array.from(files).map((file) => file.name),
+      ...Array.from(files).map((file) => ({
+        fileUrl: URL.createObjectURL(file), // Geçici URL
+        documentTitle: file.name, // Dosya adı başlık olarak
+        uploadedAt: new Date(), // Yükleme tarihi
+      })),
     ];
     setFormData({ documents: updatedFiles });
   };
 
-  const handleRemoveFile = (index) => {
-    const updatedFiles = formData.documents.filter((_, i) => i !== index);
-    setFormData({ documents: updatedFiles });
+  const handleRemoveFile = async (index) => {
+    try {
+      if (application?._id) {
+        await removeDocumentFromApplication(application._id, index);
+        console.log("Belge başarıyla silindi");
+      }
+    } catch (error) {
+      console.error("Belge silinirken bir hata oluştu:", error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (application?._id) {
+        await updateApplication(application._id, formData);
+        console.log("Başvuru başarıyla güncellendi!");
+        onClose(); // Modalı kapat
+      }
+    } catch (error) {
+      console.error("Başvuru güncellenirken bir hata oluştu:", error);
+    }
   };
 
   const handleClose = () => {
@@ -55,7 +84,7 @@ const ApplicationEditModal = ({ application, isOpen, onClose, onSubmit }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} title="Başvuru Düzenle" onClose={handleClose} onSubmit={onSubmit}>
+    <Modal isOpen={isOpen} title="Başvuru Düzenle" onClose={handleClose} onSubmit={handleSubmit}>
       <InputField
         label="Ad Soyad"
         value={formData.fullName || ""}
@@ -105,26 +134,25 @@ const ApplicationEditModal = ({ application, isOpen, onClose, onSubmit }) => {
         onChange={(value) => handleChange("eventDetails")(value)}
       />
       <div>
-  <label>Belgeler</label>
-  <input type="file" multiple onChange={(e) => handleFileChange(e.target.files)} />
-  {Array.isArray(formData.documents) && formData.documents.length > 0 ? (
-    formData.documents.map((file, index) => (
-      <div key={index} className="flex items-center">
-        <span>{file}</span>
-        <button
-          type="button"
-          onClick={() => handleRemoveFile(index)}
-          style={{ marginLeft: "10px", color: "red" }}
-        >
-          Sil
-        </button>
+        <label>Belgeler</label>
+        <input type="file" multiple onChange={(e) => handleFileChange(e.target.files)} />
+        {Array.isArray(formData.documents) && formData.documents.length > 0 ? (
+          formData.documents.map((doc, index) => (
+            <div key={index} className="flex items-center">
+              <span>{doc.documentTitle}</span> {/* Belge başlığını göster */}
+              <button
+                type="button"
+                onClick={() => handleRemoveFile(index)}
+                style={{ marginLeft: "10px", color: "red" }}
+              >
+                Sil
+              </button>
+            </div>
+          ))
+        ) : (
+          <p>Henüz belge eklenmedi.</p>
+        )}
       </div>
-    ))
-  ) : (
-    <p>Henüz belge eklenmedi.</p>
-  )}
-</div>
-
     </Modal>
   );
 };

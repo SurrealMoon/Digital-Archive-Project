@@ -8,6 +8,7 @@ import {
   assignLawyer,
   addViolation,
   addDocumentController,
+  removeDocumentController,
 } from "../controllers/application-controller";
 
 const router = express.Router();
@@ -17,7 +18,9 @@ router.get("/application-list", getAllApplications); // Tüm başvuruları liste
 router.get("/:id", getApplicationById); // Belirli bir başvuruyu getirme
 router.put("/details/:id", updateApplication); // Başvuru güncelleme
 router.delete("/:id", deleteApplication); // Başvuru silme
-router.post('/applications/:id/upload', addDocumentController);
+router.post('/:id/upload', addDocumentController);
+router.delete('/:id/documents/:index', removeDocumentController); // Döküman silme
+
 
 // Ek Özellikler
 router.put("/:id/assign-lawyer", assignLawyer); // Avukat atama

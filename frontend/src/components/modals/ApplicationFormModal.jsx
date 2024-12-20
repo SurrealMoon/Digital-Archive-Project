@@ -15,6 +15,7 @@ const ApplicationForm = () => {
     addApplication,
     closeModal,
     resetFormData,
+    removeDocumentFromApplication,
   } = useApplicationStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,9 +29,18 @@ const ApplicationForm = () => {
     setFormData({ documents: updatedFiles });
   };
 
-  const handleRemoveFile = (index) => {
-    const updatedFiles = formData.documents.filter((_, i) => i !== index);
-    setFormData({ documents: updatedFiles });
+  const handleRemoveFile = async (index) => {
+    try {
+      if (formData?._id) {
+        await removeDocumentFromApplication(formData._id, index);
+        console.log("Belge başarıyla silindi");
+      } else {
+        const updatedFiles = formData.documents.filter((_, i) => i !== index);
+        setFormData({ documents: updatedFiles });
+      }
+    } catch (error) {
+      console.error("Belge silinirken bir hata oluştu:", error);
+    }
   };
 
   const handleSubmit = async () => {
@@ -144,7 +154,7 @@ const ApplicationForm = () => {
             {formData.documents.length > 0 ? (
               formData.documents.map((file, index) => (
                 <div key={index} style={{ marginBottom: "5px" }}>
-                  <span>{file.name}</span>
+                  <span>{file.name || file.documentTitle}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveFile(index)}

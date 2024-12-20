@@ -116,3 +116,28 @@ export const addDocumentToApplication = async (
   const updatedApplication = await application.save();
   return updatedApplication;
 };
+
+export const removeDocumentFromApplication = async (
+  applicationId: string,
+  documentIndex: number
+) => {
+  const application = await Application.findById(applicationId);
+
+  if (!application) {
+    throw new Error('Application not found');
+  }
+
+  // documents property'sinin undefined olup olmadığını kontrol et
+  if (!application.documents || application.documents.length <= documentIndex || documentIndex < 0) {
+    throw new Error('Document not found');
+  }
+
+  // Silme işlemi
+  application.documents.splice(documentIndex, 1);
+
+  // Güncellenmiş başvuruyu kaydet
+  const updatedApplication = await application.save();
+
+  return updatedApplication;
+};
+

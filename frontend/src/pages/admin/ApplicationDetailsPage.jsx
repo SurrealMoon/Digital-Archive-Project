@@ -138,26 +138,27 @@ const ApplicationDetailsPage = () => {
               {formData.eventDetails}
             </div>
             <div className="mb-4">
-              <span className="font-semibold text-gray-800">Belgeler:</span>
-              {formData.documents?.length > 0 ? (
-                <ul>
-                  {formData.documents.map((doc, index) => (
-                    <li key={index}>
-                      <a
-                        href={doc}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        {doc}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                "Belge bulunamadı"
-              )}
-            </div>
+  <span className="font-semibold text-gray-800">Belgeler:</span>
+  {formData.documents?.length > 0 ? (
+    <ul>
+      {formData.documents.map((doc, index) => (
+        <li key={index}>
+          <a
+            href={doc.fileUrl} // doc yerine doc.fileUrl kullanın
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            {doc.documentTitle || doc.fileUrl} 
+            {/* doc objesini doğrudan yazmayın, metin alanlarını kullanın */}
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    "Belge bulunamadı"
+  )}
+</div>
           </div>
 
           <div className="mt-6 w-full flex space-x-4">

@@ -1,6 +1,8 @@
 import AWS from "aws-sdk";
 import { ManagedUpload } from "aws-sdk/clients/s3";
 import dotenv from "dotenv";
+import { v4 as uuidv4 } from 'uuid';
+
 
 dotenv.config();
 
@@ -23,9 +25,12 @@ class FileService {
         throw new Error('Bucket name is not defined in the environment variables');
       }
 
+      // Benzersiz bir dosya adı oluştur
+      const uniqueFileName = `${Date.now()}-${uuidv4()}-${file.originalname}`;
+
       const params = {
         Bucket: this.BUCKET_NAME,
-        Key: file.originalname,
+        Key: uniqueFileName,
         Body: file.buffer,
         ContentType: file.mimetype,
       };
@@ -38,6 +43,7 @@ class FileService {
       throw new Error('File upload failed');
     }
   }
+
 
   async getFile(key: string): Promise<AWS.S3.GetObjectOutput> {
     const params = {

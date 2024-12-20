@@ -8,6 +8,7 @@ import {
   assignLawyerService,
   addViolationService,
   addDocumentToApplication,
+  removeDocumentFromApplication,
 } from "../services/application-service";
 import FileService from '../services/upload-service';
 
@@ -188,3 +189,22 @@ export const addDocumentController = async (
   }
 };
 
+export const removeDocumentController = async (
+  req: Request<{ id: string; index: string }, {}, {}, {}>, // Parametreler doğru şekilde tipli
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id, index } = req.params; // Parametrelerden alınan applicationId ve documentIndex
+    const applicationId = id;
+    const documentIndex = parseInt(index); // Silinecek belgenin indeksini al
+
+    // Silme işlemi için service fonksiyonunu çağır
+    const updatedApplication = await removeDocumentFromApplication(applicationId, documentIndex);
+
+    // Başvuruyu güncelledikten sonra başarılı bir yanıt döndür
+    res.status(200).json(updatedApplication); // Güncellenmiş başvuru döndürülür
+  } catch (error) {
+    next(error); // Hata varsa error handler'a yönlendir
+  }
+};
