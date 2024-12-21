@@ -47,16 +47,53 @@ const useApplicationStore = create((set, get) => ({
    addApplication: async () => {
     try {
       const { formData } = get();
-      const payload = {
+  
+      // Yeni başvuru oluştur
+      const applicationPayload = {
         ...formData,
         applicationDate: formData.applicationDate.toISOString(),
+        documents: [], // İlk başta boş bir documents gönderiyoruz
       };
-      console.log("Gönderilen Payload:", payload);
-
-      const response = await axiosInstance.post("/applications/create", payload);
-
+  
+      console.log("Gönderilen Başvuru Payload:", applicationPayload);
+  
+      const createResponse = await axiosInstance.post(
+        "/applications/create",
+        applicationPayload
+      );
+  
+      const applicationId = createResponse.data._id; // Oluşturulan başvurunun ID'si
+  
+      // Eğer birden fazla dosya yüklendiyse, dosyaları sırayla yükle
+      if (formData.documents && formData.documents.length > 0) {
+        for (const file of formData.documents) {
+          if (file instanceof File) {
+            const fileFormData = new FormData();
+            fileFormData.append("file", file); // Dosya
+            fileFormData.append(
+              "documentTitle",
+              formData.documentTitle || file.name // Dosya başlığı
+            );
+  
+            console.log("Yüklenmekte Olan Dosya Payload:", fileFormData);
+  
+            // Dosyayı yükleme
+            await axiosInstance.post(
+              `/applications/${applicationId}/upload`, // Doğru endpoint
+              fileFormData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data", // FormData için gerekli
+                },
+              }
+            );
+          }
+        }
+      }
+  
+      // State'i güncelle
       set((state) => ({
-        applications: [...state.applications, response.data],
+        applications: [...state.applications, createResponse.data],
         formData: {
           citizenId: "",
           fullName: "",
@@ -67,17 +104,21 @@ const useApplicationStore = create((set, get) => ({
           eventCategory: "",
           eventSummary: "",
           eventDetails: "",
-          documents: [],
+          documents: [], // Formdan yüklenen dokümanları sıfırla
           processedBy: "",
         },
         isModalOpen: false,
         error: null,
       }));
+  
+      alert("Başvuru başarıyla oluşturuldu!");
     } catch (error) {
       set({ error: "Başvuru eklenirken bir hata oluştu." });
       console.error(error.response?.data || error.message);
     }
   },
+  
+  
 
   // Başvuruya belge ekleme
   addDocumentToApplication: async (applicationId, file, documentTitle) => {
