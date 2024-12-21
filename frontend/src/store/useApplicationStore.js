@@ -166,6 +166,32 @@ updateApplication: async (applicationId, updatedData) => {
   }
 },
 
+// Avukat atama fonksiyonu
+assignLawyerToApplication: async (applicationId, lawyerId) => {
+  try {
+    const response = await axiosInstance.put(`/applications/${applicationId}/assign-lawyer`, {
+      lawyerId,
+    });
+
+    // Gelen verilerde avukat bilgisi (örneğin isim) varsa bunu da formData'ya ekleyebiliriz
+    const updatedApplication = response.data;
+
+    set((state) => ({
+      applications: state.applications.map((app) =>
+        app._id === applicationId ? updatedApplication : app
+      ),
+      formData: state.formData._id === applicationId ? updatedApplication : state.formData,
+      error: null,
+    }));
+
+    console.log("Avukat başarıyla atandı:", updatedApplication);
+  } catch (error) {
+    set({ error: "Avukat ataması sırasında bir hata oluştu." });
+    console.error(error);
+  }
+},
+
+
   // Form verisini güncelleme
   setFormData: (data) =>
     set((state) => {

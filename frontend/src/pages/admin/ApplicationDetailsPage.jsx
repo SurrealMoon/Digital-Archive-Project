@@ -18,6 +18,7 @@ const ApplicationDetailsPage = () => {
     setFormData,
     addApplicationLawyer,
     assignHandler,
+    assignLawyerToApplication,
   } = useApplicationStore();
   const { lawyers, fetchLawyers } = useLawyerStore();
   const { openModal } = useArchiveStore();
@@ -41,24 +42,23 @@ const ApplicationDetailsPage = () => {
   // Avukat ekleme işlemi
   const handleAddLawyer = () => {
     if (selectedLawyer) {
-      addApplicationLawyer(formData._id, selectedLawyer); // Başvuru ve avukat ID'si gönderiliyor
-      alert(`Avukat başarıyla atandı!`);
+      assignLawyerToApplication(formData._id, selectedLawyer); // Yeni fonksiyonu çağır
+      alert("Avukat başarıyla atandı!");
       setSelectedLawyer(""); // Seçimi sıfırla
     } else {
       alert("Lütfen bir avukat seçin.");
     }
   };
   
-  
 
   // Başvuruyu alan kişi ekleme işlemi
   const handleAssignHandler = () => {
     if (handlerName && formData) {
       // Form verisine 'processedBy' alanını ekle
-      setFormData({ processedBy: handlerName });
+      const updatedData = { ...formData, processedBy: handlerName };
   
       // Güncelleme API çağrısını tetikle
-      updateApplication(formData._id);
+      updateApplication(formData._id, updatedData);
   
       alert(`Başvuruyu alan kişi ${handlerName} olarak eklendi!`);
       setHandlerName(""); // Input'u sıfırla
@@ -66,6 +66,7 @@ const ApplicationDetailsPage = () => {
       alert("Lütfen bir isim girin.");
     }
   };
+  
 
   // Düzenleme modalını aç
   const handleEdit = () => {
