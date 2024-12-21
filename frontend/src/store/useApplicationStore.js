@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axiosInstance from "../utils/axiosInstance";
+import { createCaseService } from "../services/caseService";
 
 const useApplicationStore = create((set, get) => ({
   applications: [], // Başvuruların listesi
@@ -208,14 +209,26 @@ updateApplication: async (applicationId, updatedData) => {
 },
 
 // Avukat atama fonksiyonu
+// Avukat atama fonksiyonu
 assignLawyerToApplication: async (applicationId, lawyerId) => {
   try {
+    // Avukatı başvuruya ata
     const response = await axiosInstance.put(`/applications/${applicationId}/assign-lawyer`, {
       lawyerId,
     });
 
-    // Gelen verilerde avukat bilgisi (örneğin isim) varsa bunu da formData'ya ekleyebiliriz
+    // Başvuruya avukat eklendikten sonra, yeni bir dava (case) oluştur
     const updatedApplication = response.data;
+
+    // createCaseService fonksiyonunu çağır
+    const caseData = {
+      applicationId: updatedApplication._id, // Başvurunun id'sini kullan
+      lawyerId, // Avukatın id'sini kullan
+      clientname: updatedApplication.fullName, // Başvurudan alınan isim
+      // Diğer gerekli case verileri buraya eklenebilir
+    };
+
+    const newCase = await createCaseService(caseData);
 
     set((state) => ({
       applications: state.applications.map((app) =>
@@ -225,7 +238,7 @@ assignLawyerToApplication: async (applicationId, lawyerId) => {
       error: null,
     }));
 
-    console.log("Avukat başarıyla atandı:", updatedApplication);
+    console.log("Avukat başarıyla atandı ve yeni dava oluşturuldu:", updatedApplication, newCase);
   } catch (error) {
     set({ error: "Avukat ataması sırasında bir hata oluştu." });
     console.error(error);

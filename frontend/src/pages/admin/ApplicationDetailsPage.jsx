@@ -40,10 +40,10 @@ const ApplicationDetailsPage = () => {
   
 
   // Avukat ekleme işlemi
-  const handleAddLawyer = () => {
+  const handleAddLawyer = async () => {
     if (selectedLawyer) {
-      assignLawyerToApplication(formData._id, selectedLawyer); // Yeni fonksiyonu çağır
-      alert("Avukat başarıyla atandı!");
+      await assignLawyerToApplication(formData._id, selectedLawyer); // Yeni fonksiyonu çağır
+      alert("Avukat başarıyla atandı ve dava oluşturuldu!");
       setSelectedLawyer(""); // Seçimi sıfırla
     } else {
       alert("Lütfen bir avukat seçin.");

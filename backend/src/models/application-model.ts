@@ -20,6 +20,7 @@ export interface IApplication extends Document {
   }[]; // Nesne listesi burada inline tanımlı
   processedBy?: string; // Başvuruyu düzenleyen baro personelinin adı
   lawyerId?: mongoose.Types.ObjectId; // Atanan avukatın referansı
+  caseId?: mongoose.Types.ObjectId;
 }
 
 
