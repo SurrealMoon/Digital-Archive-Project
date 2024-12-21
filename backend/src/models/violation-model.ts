@@ -4,8 +4,8 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IViolation extends Document {
   type: "Media Monitoring" | "NGO Data" | "Bar Association Committees" | "Public Institutions"; // Violation type
   monitoringPeriod: string; // Tarama dönemi
-  eventCategory: string; // Olay kategorisi
-  eventSummary: string; // Olay özeti
+  eventCategory?: string; // Olay kategorisi
+  eventSummary?: string; // Olay özeti
   link?: string; // Related link
   documents: { title: string; file: string }[]; // Uploaded documents (title and file URL)
   victimNameSurname?: string; // Victim's name and surname
@@ -30,8 +30,8 @@ const ViolationSchema = new Schema<IViolation>(
       required: true,
     },
     monitoringPeriod: { type: String, required: true }, // Tarama dönemi
-    eventCategory: { type: String, required: true }, // Olay kategorisi
-    eventSummary: { type: String, required: true }, // Olay özeti
+    eventCategory: { type: String }, // Olay kategorisi
+    eventSummary: { type: String }, // Olay özeti
     link: { type: String }, // Opsiyonel
     documents: [
       {
