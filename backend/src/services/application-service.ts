@@ -97,7 +97,7 @@ export const addDocumentToApplication = async (
 
   if (!application) {
     console.error("Application not found for ID:", applicationId);
-    throw new Error('Application not found'); // Başvuru bulunamazsa hata fırlat
+    throw new Error('Application not found'); 
   }
 
   console.log("Application found:", application);

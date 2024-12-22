@@ -4,63 +4,67 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface ICase extends Document {
   applicationId: mongoose.Types.ObjectId; // Bağlı olduğu başvuru ID'si
   lawyerId?: mongoose.Types.ObjectId; // Davayı takip eden avukat
-  clientname: string; // Müvekkil ad-soyad
+  clientname: string; // Müvekkil adı-soyadı
   otherlawyer?: string; // Opsiyonel, varsa diğer avukat
-  courtName?: string; // Mahkeme adı veya CBS
-  courtFileOrInsvestigationNo?: string; // Mahkeme veya savcılık dosya numarası
+  courtName?: string; // Mahkeme adı
+  courtFileOrInvestigationNo?: string; // Mahkeme veya savcılık dosya numarası
   caseTitle?: string; // Dava başlığı
   caseDescription?: string; // Dava açıklaması
-  documentTitle?: string; // Döküman başlığı (opsiyonel)
-  documents?: string[]; // Yüklenen dosyalar
- 
+  documentTitle?: string; // Döküman başlığı
+  documents?: {
+    fileUrl: string;
+    documentTitle: string;
+    uploadedAt: Date;
+  }[]; // Yüklenen dosyaların listesi
 }
 
 // Dava Şeması
 const CaseSchema: Schema = new Schema(
   {
-    applicationId: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "Application", 
-      required: true 
-    }, // Application ile bağlantı
-    lawyerId: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "User" 
-    }, // Sistemde kayıtlı bir avukat
-    caseId: {
+    applicationId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Case",
+      ref: "Application",
+      required: true,
     },
-    clientname: { 
-      type: String, 
-      required: true 
-    }, // Müvekkil adı-soyadı
-    otherlawyer: { 
-      type: String 
-    }, // Opsiyonel, varsa diğer avukat
-    courtName: { 
-      type: String 
-    }, // Mahkeme adı veya CBS (opsiyonel hale getirildi)
-    courtFileOrInsvestigationNo: { 
-      type: String 
-    }, // Mahkeme dosya numarası veya soruşturma numarası (opsiyonel hale getirildi)
-    caseTitle: { 
-      type: String 
-    }, // Dava başlığı (opsiyonel hale getirildi)
-    caseDescription: { 
-      type: String 
-    }, // Dava açıklaması (opsiyonel hale getirildi)
-    documentTitle: { 
-      type: String 
-    }, // Döküman başlığı (opsiyonel)
-    documents: { 
-      type: [String] 
-    }, // Yüklenen dosyaların dizisi
+    lawyerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    clientname: {
+      type: String,
+      required: true,
+    },
+    otherlawyer: {
+      type: String,
+    },
+    courtName: {
+      type: String,
+    },
+    courtFileOrInvestigationNo: {
+      type: String,
+    },
+    caseTitle: {
+      type: String,
+    },
+    caseDescription: {
+      type: String,
+    },
+    documentTitle: {
+      type: String,
+    },
+    documents: {
+      type: [
+        {
+          fileUrl: { type: String, required: true },
+          documentTitle: { type: String, required: true },
+          uploadedAt: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
   },
-  { timestamps: true } // createdAt ve updatedAt otomatik olarak eklenir
+  { timestamps: true }
 );
 
-
-// Model
 const Case = mongoose.model<ICase>("Case", CaseSchema);
 export default Case;

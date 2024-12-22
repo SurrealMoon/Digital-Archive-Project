@@ -1,5 +1,5 @@
 import Case, { ICase } from "../models/case-model";
-import Application , {IApplication} from "../models/application-model";
+import Application, { IApplication } from "../models/application-model";
 import mongoose from "mongoose";
 
 // Yeni Dava Oluşturma
@@ -10,48 +10,37 @@ export const createCaseService = async (data: Partial<ICase>): Promise<ICase> =>
     clientname,
     otherlawyer,
     courtName,
-    courtFileOrInsvestigationNo,
+    courtFileOrInvestigationNo,
     caseTitle,
     caseDescription,
     documents,
     documentTitle,
   } = data;
 
-  // Bağlı başvuruyu bul
   const application: IApplication | null = await Application.findById(applicationId).exec();
   if (!application) {
     throw new Error("Application not found");
   }
 
-  // Avukatı belirle: Başvurudan alınabilir ya da manuel girilebilir
-  const caseLawyer = lawyerId || application.lawyerId;
-  if (!caseLawyer) {
-    throw new Error("Lawyer must be assigned to the application or provided to create a case");
-  }
-
-  // Müvekkil adını belirle: Başvurudan alınabilir ya da manuel girilebilir
   const caseClientName = clientname || application.fullName;
 
-  // Yeni dava oluştur
   const newCase = new Case({
     applicationId: application._id,
-    lawyerId: caseLawyer,
+    lawyerId: lawyerId || application.lawyerId,
     clientname: caseClientName,
     otherlawyer,
     courtName,
-    courtFileOrInsvestigationNo,
+    courtFileOrInvestigationNo,
     caseTitle,
     caseDescription,
     documents,
     documentTitle,
   });
 
-  // Yeni davayı veritabanına kaydet
   await newCase.save();
 
-  // Başvuruya dava bilgisi ekle
   if (!application.caseId) {
-    application.caseId = newCase._id as mongoose.Types.ObjectId; // Eğer Application modelinde `caseId` varsa
+    application.caseId = newCase._id as mongoose.Types.ObjectId;
     await application.save();
   }
 
@@ -60,19 +49,14 @@ export const createCaseService = async (data: Partial<ICase>): Promise<ICase> =>
 
 // Tüm Davaları Listeleme
 export const getAllCasesService = async (filter: object = {}): Promise<ICase[]> => {
-  try {
-    // Filtre ile davaları bul
-    const cases = await Case.find(filter)
-      .populate("applicationId", "fullName") // İlişkili Application bilgisi (özellikle clientname veya fullName)
-      .populate("lawyerId", "name") // İlişkili Lawyer bilgisi (özellikle avukat adı)
-      .exec();
+  const cases = await Case.find(filter)
+    .populate("applicationId", "fullName")
+    .populate("lawyerId", "name")
+    .exec();
 
-    return cases;
-  } catch (error) {
-    console.error("Error getting cases:", error);
-    throw new Error("Error fetching cases.");
-  }
+  return cases;
 };
+
 // Belirli Bir Davayı Getirme
 export const getCaseByIdService = async (id: string): Promise<ICase | null> => {
   return await Case.findById(id).populate("lawyerId", "fullName email phone role");
@@ -89,4 +73,63 @@ export const updateCaseService = async (
 // Dava Silme
 export const deleteCaseService = async (id: string): Promise<ICase | null> => {
   return await Case.findByIdAndDelete(id);
+};
+
+// Davaya döküman ekleme
+export const addDocumentToCase = async (
+  caseId: string,
+  fileUrl: string,
+  documentTitle: string
+) => {
+  const caseDocument = await Case.findById(caseId);
+
+  if (!caseDocument) {
+    throw new Error("Case not found");
+  }
+
+  const newDocument = {
+    fileUrl,
+    documentTitle,
+    uploadedAt: new Date(),
+  };
+
+  if (!Array.isArray(caseDocument.documents)) {
+    throw new Error("Invalid documents structure in case");
+  }
+
+  caseDocument.documents.push(newDocument);
+
+  // Güncellenmiş Case belgesini kaydet ve döndür
+  const updatedCase = await caseDocument.save();
+
+  return updatedCase;
+};
+
+// Davadan doküman silme
+export const removeDocumentFromCase = async (
+  caseId: string,
+  documentIndex: number
+) => {
+  const caseDocument = await Case.findById(caseId);
+
+  if (!caseDocument) {
+    throw new Error("Case not found");
+  }
+
+  // Documents alanını kontrol et
+  if (
+    !caseDocument.documents ||
+    documentIndex < 0 ||
+    documentIndex >= caseDocument.documents.length
+  ) {
+    throw new Error("Document not found");
+  }
+
+  // Belirtilen dokümanı sil
+  caseDocument.documents.splice(documentIndex, 1);
+
+  // Güncellenmiş Case belgesini kaydet ve döndür
+  const updatedCase = await caseDocument.save();
+
+  return updatedCase;
 };

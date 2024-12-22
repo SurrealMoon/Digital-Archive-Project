@@ -1,6 +1,8 @@
 import express from 'express';
 import multer from 'multer';
 import { addDocumentController} from '../controllers/application-controller';
+import { addDocumentToCaseController, removeDocumentFromCaseController } from "../controllers/case-controller";
+
 
 const router = express.Router();
 // Multer yapılandırması
@@ -22,8 +24,17 @@ const upload = multer({
 // Dosya yükleme rotası
 router.post('/applications/:id/upload', upload.single('file'), (req, res, next) => {
 
-  // addDocumentController çağrısını burada devam ettirin
   addDocumentController(req as any, res, next);
+});
+
+// Davaya döküman ekleme
+router.post("/cases/:id/upload", upload.single("file"), (req, res, next) => {
+  addDocumentToCaseController(req as any, res, next);
+});
+
+// Dava'dan döküman silme
+router.delete("/cases/:id/documents/:index", (req, res, next) => {
+  removeDocumentFromCaseController(req as any, res, next);
 });
 
 export default router;

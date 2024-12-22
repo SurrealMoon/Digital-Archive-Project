@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import axiosInstance from "../utils/axiosInstance";
-import { createCaseService } from "../services/caseService";
 
 const useApplicationStore = create((set, get) => ({
   applications: [], // Başvuruların listesi
