@@ -16,20 +16,29 @@ const AddCaseDetails = () => {
   } = useCaseStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false); // Yeni kayıt mı güncelleme mi
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
   };
 
   const handleFileChange = (files) => {
-    const updatedFiles = [...formData.documents, ...Array.from(files)];
-    setFormData({ documents: updatedFiles });
+    const updatedFiles = Array.from(files).map((file) => ({
+      fileUrl: "", // Başlangıçta boş bırakılır, S3'e yüklendikten sonra güncellenir
+      documentTitle: "", // Kullanıcı tarafından girilir
+    }));
+    setFormData({ documents: [...formData.documents, ...updatedFiles] });
   };
 
   const handleRemoveFile = (index) => {
     const updatedFiles = formData.documents.filter((_, i) => i !== index);
     setFormData({ documents: updatedFiles });
+  };
+
+  const handleDocumentTitleChange = (index, value) => {
+    const updatedDocuments = [...formData.documents];
+    updatedDocuments[index].documentTitle = value;
+    setFormData({ documents: updatedDocuments });
   };
 
   const handleSubmit = async () => {
@@ -90,8 +99,8 @@ const AddCaseDetails = () => {
         />
         <InputField
           label="Mahkeme Dosya Numarası"
-          value={formData.courtFileNo}
-          onChange={handleChange("courtFileNo")}
+          value={formData.courtFileOrInvestigationNo}
+          onChange={handleChange("courtFileOrInvestigationNo")}
           placeholder="Mahkeme dosya numarasını giriniz"
         />
         <InputField
@@ -106,12 +115,6 @@ const AddCaseDetails = () => {
           onChange={handleChange("caseDescription")}
           placeholder="Dava açıklamasını giriniz"
         />
-        <InputField
-          label="Döküman Başlığı"
-          value={formData.documentTitle}
-          onChange={handleChange("documentTitle")}
-          placeholder="Döküman başlığını giriniz"
-        />
         <div style={{ marginBottom: "15px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>Döküman Ekleme:</label>
           <input
@@ -121,9 +124,14 @@ const AddCaseDetails = () => {
             style={{ display: "block", marginBottom: "10px" }}
           />
           {formData.documents.length > 0 ? (
-            formData.documents.map((file, index) => (
-              <div key={index} style={{ marginBottom: "5px" }}>
-                <span>{file.name}</span>
+            formData.documents.map((doc, index) => (
+              <div key={index} style={{ marginBottom: "10px" }}>
+                <InputField
+                  label="Döküman Başlığı"
+                  value={doc.documentTitle}
+                  onChange={(value) => handleDocumentTitleChange(index, value)}
+                  placeholder="Döküman başlığını giriniz"
+                />
                 <button
                   type="button"
                   onClick={() => handleRemoveFile(index)}
