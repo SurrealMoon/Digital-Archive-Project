@@ -22,31 +22,42 @@ const useCaseStore = create((set, get) => ({
       formData: { ...state.formData, ...newData },
     })),
 
-  fetchCases: async () => {
-    set({ loading: true, error: null });
-    try {
-      const response = await axiosInstance.get("/cases/getallcases");
-      const fetchedCases = response.data.map((caseItem) => ({
-        id: caseItem._id,
-        name: caseItem.applicationId?.fullName || "Belirtilmemiş",
-        category: caseItem.applicationId?.eventCategory || "Belirtilmemiş",
-        lawyerName: caseItem.lawyerId?.fullName || "Belirtilmemiş",
-        clientname: caseItem.clientname || "Belirtilmemiş",
-        otherlawyer: caseItem.otherlawyer || "Belirtilmemiş",
-        courtName: caseItem.courtName || "Belirtilmemiş",
-        courtFileOrInvestigationNo:
-          caseItem.courtFileOrInvestigationNo || "Belirtilmemiş",
-        caseTitle: caseItem.caseTitle || "Belirtilmemiş",
-        caseDescription: caseItem.caseDescription || "Belirtilmemiş",
-        documents: caseItem.documents || [],
-      }));
-
-      set({ cases: fetchedCases, loading: false });
-    } catch (error) {
-      console.error("Dava listesi alınırken hata oluştu:", error);
-      set({ error: error.message, loading: false });
-    }
-  },
+    fetchCases: async () => {
+      set({ loading: true, error: null });
+      try {
+        const response = await axiosInstance.get("/cases/getallcases");
+        const fetchedCases = response.data.map((caseItem) => ({
+          id: caseItem._id,
+          name: caseItem.applicationId?.fullName || "Belirtilmemiş", // Başvuran adı-soyadı
+          citizenId: caseItem.applicationId?.citizenId || "Belirtilmemiş", // Kimlik numarası
+          phone: caseItem.applicationId?.phone || "Belirtilmemiş", // Telefon numarası
+          email: caseItem.applicationId?.email || "Belirtilmemiş", // E-posta adresi
+          address: caseItem.applicationId?.address || "Belirtilmemiş", // Adres
+          applicationDate:
+            caseItem.applicationId?.applicationDate ||
+            "Belirtilmemiş", // Başvuru tarihi
+          eventCategory: caseItem.applicationId?.eventCategory || "Belirtilmemiş", // Olay kategorisi
+          eventSummary: caseItem.applicationId?.eventSummary || "Belirtilmemiş", // Olay özeti
+          eventDetails: caseItem.applicationId?.eventDetails || "Belirtilmemiş", // Olay detayları
+          documents: caseItem.applicationId?.documents || [], // Başvuru belgeleri
+          lawyerName: caseItem.lawyerId?.fullName || "Belirtilmemiş", // Atanan avukat
+          clientname: caseItem.clientname || "Belirtilmemiş", // Müvekkil adı
+          otherlawyer: caseItem.otherlawyer || "Belirtilmemiş", // Diğer avukat
+          courtName: caseItem.courtName || "Belirtilmemiş", // Mahkeme adı
+          courtFileOrInvestigationNo:
+            caseItem.courtFileOrInvestigationNo || "Belirtilmemiş", // Mahkeme dosya numarası
+          caseTitle: caseItem.caseTitle || "Belirtilmemiş", // Dava başlığı
+          caseDescription: caseItem.caseDescription || "Belirtilmemiş", // Dava açıklaması
+          caseDocuments: caseItem.documents || [], // Dava belgeleri
+        }));
+    
+        set({ cases: fetchedCases, loading: false });
+      } catch (error) {
+        console.error("Dava listesi alınırken hata oluştu:", error);
+        set({ error: error.message, loading: false });
+      }
+    },
+    
 
   addCase: async () => {
     const formData = get().formData;

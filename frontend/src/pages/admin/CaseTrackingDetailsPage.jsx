@@ -6,52 +6,91 @@ const CaseDetailsPage = () => {
   const { id } = useParams(); // Router'dan case ID alınır
   const { getCaseById } = useCaseStore(); // Store'dan ilgili case'i getirecek fonksiyon
   const [caseData, setCaseData] = useState(null); // Dava detaylarını tutar
+  const [applicationData, setApplicationData] = useState(null); // Başvuru detaylarını tutar
 
   useEffect(() => {
     const fetchedCase = getCaseById(id); // ID ile case'i getir
     if (fetchedCase) {
-      setCaseData(fetchedCase); // Case bulunduğunda state'e kaydet
+      setCaseData(fetchedCase); // Case verisini state'e kaydet
+      setApplicationData(fetchedCase.applicationId); // Başvuruyu state'e kaydet
     }
   }, [id, getCaseById]);
 
-  if (!caseData) {
-    return <div>Dava bulunamadı.</div>;
+  if (!caseData || !applicationData) {
+    return <div>Yükleniyor veya veri bulunamadı.</div>;
   }
 
   return (
     <div className="flex flex-col items-center p-8 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-800">Dava Detayları</h1>
+      {/* Başvuru Detayları */}
+      <h1 className="text-2xl font-bold text-gray-800">Başvuru Detayları</h1>
+      <div className="mt-6 w-full max-w-4xl bg-white shadow-xl rounded-lg p-6">
+        <div className="mb-4">
+          <span className="font-semibold text-gray-800">Ad Soyad:</span> {applicationData.fullName}
+        </div>
+        <div className="mb-4">
+          <span className="font-semibold text-gray-800">Kimlik Numarası:</span> {applicationData.citizenId}
+        </div>
+        <div className="mb-4">
+          <span className="font-semibold text-gray-800">Telefon:</span> {applicationData.phone}
+        </div>
+        <div className="mb-4">
+          <span className="font-semibold text-gray-800">E-posta:</span> {applicationData.email}
+        </div>
+        <div className="mb-4">
+          <span className="font-semibold text-gray-800">Adres:</span> {applicationData.address}
+        </div>
+        <div className="mb-4">
+          <span className="font-semibold text-gray-800">Başvuru Tarihi:</span>{" "}
+          {new Date(applicationData.applicationDate).toLocaleDateString()}
+        </div>
+        <div className="mb-4">
+          <span className="font-semibold text-gray-800">Başlık:</span> {applicationData.eventSummary}
+        </div>
+        <div className="mb-4">
+          <span className="font-semibold text-gray-800">Detaylar:</span> {applicationData.eventDetails}
+        </div>
+        <div className="mb-4">
+          <span className="font-semibold text-gray-800">Belgeler:</span>
+          {applicationData.documents?.length > 0 ? (
+            <ul>
+              {applicationData.documents.map((doc, index) => (
+                <li key={index}>
+                  <a
+                    href={doc.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {doc.documentTitle || doc.fileUrl}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            "Belge bulunamadı."
+          )}
+        </div>
+      </div>
 
-      {/* Dava Bilgileri */}
+      {/* Dava Detayları */}
+      <h1 className="text-2xl font-bold text-gray-800 mt-8">Dava Detayları</h1>
       <div className="mt-6 w-full max-w-4xl bg-white shadow-lg rounded-lg p-6">
-        <h2 className="text-lg font-semibold text-gray-800">{caseData.clientname}</h2>
         <div className="mb-4">
-          <span className="font-semibold text-gray-800">Başvuru ID: </span>
-          <span>{caseData.applicationId || "Belirtilmemiş"}</span>
+          <span className="font-semibold text-gray-800">Müvekkil:</span> {caseData.clientname || "Belirtilmemiş"}
         </div>
         <div className="mb-4">
-          <span className="font-semibold text-gray-800">Avukat: </span>
-          <span>{caseData.lawyerName || "Belirtilmemiş"}</span>
+          <span className="font-semibold text-gray-800">Mahkeme Adı:</span> {caseData.courtName || "Belirtilmemiş"}
         </div>
         <div className="mb-4">
-          <span className="font-semibold text-gray-800">Başvuru Konusu: </span>
-          <span>{caseData.category || "Belirtilmemiş"}</span>
+          <span className="font-semibold text-gray-800">Dosya No:</span>{" "}
+          {caseData.courtFileOrInvestigationNo || "Belirtilmemiş"}
         </div>
         <div className="mb-4">
-          <span className="font-semibold text-gray-800">Mahkeme Adı: </span>
-          <span>{caseData.courtName || "Belirtilmemiş"}</span>
+          <span className="font-semibold text-gray-800">Dava Başlığı:</span> {caseData.caseTitle || "Belirtilmemiş"}
         </div>
         <div className="mb-4">
-          <span className="font-semibold text-gray-800">Dosya No: </span>
-          <span>{caseData.courtFileOrInvestigationNo || "Belirtilmemiş"}</span>
-        </div>
-        <div className="mb-4">
-          <span className="font-semibold text-gray-800">Dava Başlığı: </span>
-          <span>{caseData.caseTitle || "Belirtilmemiş"}</span>
-        </div>
-        <div className="mb-4">
-          <span className="font-semibold text-gray-800">Dava Açıklaması: </span>
-          <span>{caseData.caseDescription || "Belirtilmemiş"}</span>
+          <span className="font-semibold text-gray-800">Dava Açıklaması:</span> {caseData.caseDescription || "Belirtilmemiş"}
         </div>
         <div className="mb-4">
           <span className="font-semibold text-gray-800">Belgeler:</span>

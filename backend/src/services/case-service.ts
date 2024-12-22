@@ -48,14 +48,14 @@ export const createCaseService = async (data: Partial<ICase>): Promise<ICase> =>
 // Tüm Davaları Listeleme
 export const getAllCasesService = async (filter: object = {}): Promise<ICase[]> => {
   const cases = await Case.find(filter)
-  .populate({
-    path: 'applicationId',
-    select: 'fullName eventCategory', // Yalnızca gereken alanlar
-  })
-    .populate("lawyerId", "fullName")
+    .populate({
+      path: 'applicationId',
+      select: 'fullName citizenId phone email address applicationDate eventCategory eventSummary eventDetails documents', // Gerekli tüm alanlar
+    })
+    .populate("lawyerId", "fullName") // Avukat bilgileri için fullName alanı
     .exec();
 
-  return cases;
+  return cases;
 };
 
 // Belirli Bir Davayı Getirme

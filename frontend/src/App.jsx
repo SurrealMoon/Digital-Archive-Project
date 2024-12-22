@@ -43,6 +43,7 @@ function App() {
           <Route path="application-list" element={<ApplicationPage />} />
           <Route path="application-list/details/:id" element={<ApplicationDetailsPage />} />
           <Route path="case-list" element={<CaseTrackingPage />} />
+          <Route path="case-list/details/:id" element={<CaseDetailsPage />} />
           <Route path="lawyer-list" element={<LawyerListPage />} />
           <Route path="rights-violation-archive" element={<HumanRightsViolationArchivePage />} />
         </Route>
