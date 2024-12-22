@@ -21,7 +21,7 @@ const upload = multer({
   },
 });
 
-// Dosya yükleme rotası
+// Başvuruya döküman ekleme 
 router.post('/applications/:id/upload', upload.single('file'), (req, res, next) => {
 
   addDocumentController(req as any, res, next);
@@ -32,7 +32,7 @@ router.post("/cases/:id/upload", upload.single("file"), (req, res, next) => {
   addDocumentToCaseController(req as any, res, next);
 });
 
-// Dava'dan döküman silme
+// Davadan döküman silme
 router.delete("/cases/:id/documents/:index", (req, res, next) => {
   removeDocumentFromCaseController(req as any, res, next);
 });

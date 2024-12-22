@@ -50,13 +50,13 @@ const CaseSchema: Schema = new Schema(
       type: String,
     },
     documentTitle: {
-      type: String,
+      type: String, // Tekil doküman başlığı tekrar eklendi
     },
     documents: {
       type: [
         {
           fileUrl: { type: String, required: true },
-          documentTitle: { type: String, required: true },
+          documentTitle: { type: String, required: true }, // İç doküman başlığı
           uploadedAt: { type: Date, default: Date.now },
         },
       ],

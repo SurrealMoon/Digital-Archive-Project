@@ -98,33 +98,43 @@ export const addDocumentToCaseController = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const { documentTitle } = req.body; // Document Title'ı alın
+
+    // Dosya yüklenmediyse hata döndür
     if (!req.file) {
       res.status(400).json({ message: "No file uploaded" });
       return;
     }
 
+    // Document Title boşsa hata döndür
+    if (!documentTitle || documentTitle.trim() === "") {
+      res.status(400).json({ message: "Document title is required" });
+      return;
+    }
+
+    // AWS S3'e dosya yükle
     const uploadResult = await FileService.uploadFile(req.file);
     const fileUrl = uploadResult.Location;
 
-    const updatedCase = await addDocumentToCase(
-      req.params.id,
-      fileUrl,
-      req.body.documentTitle
-    );
+    // Case'e doküman ekle
+    const updatedCase = await addDocumentToCase(req.params.id, fileUrl, documentTitle);
 
     if (!updatedCase) {
       res.status(404).json({ message: "Case not found" });
       return;
     }
 
+    // Başarılı yanıt döndür
     res.status(200).json({
       message: "File uploaded successfully to case",
-      fileUrl,
+      updatedCase,
     });
   } catch (error) {
     next(error);
   }
 };
+
+
 // Davadan doküman silme
 export const removeDocumentFromCaseController = async (
   req: Request<{ id: string; index: string }, {}, {}, {}>,

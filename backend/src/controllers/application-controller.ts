@@ -93,7 +93,7 @@ export const deleteApplication: RequestHandler = async (req, res, next) => {
   }
 };
 
-// Avukat Atama
+// Avukat Atama ve Dava Oluşturma
 export const assignLawyer: RequestHandler = async (req, res, next) => {
   try {
     const { id } = req.params; // Başvuru ID

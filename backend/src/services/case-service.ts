@@ -2,43 +2,40 @@ import Case, { ICase } from "../models/case-model";
 import Application, { IApplication } from "../models/application-model";
 import mongoose from "mongoose";
 
-// Yeni Dava Oluşturma
 export const createCaseService = async (data: Partial<ICase>): Promise<ICase> => {
   const {
     applicationId,
     lawyerId,
     clientname,
-    otherlawyer,
-    courtName,
-    courtFileOrInvestigationNo,
-    caseTitle,
-    caseDescription,
-    documents,
-    documentTitle,
   } = data;
 
+  // Başvuru verilerini al
   const application: IApplication | null = await Application.findById(applicationId).exec();
   if (!application) {
     throw new Error("Application not found");
   }
 
+  // Müvekkil adı başvurudan alınır
   const caseClientName = clientname || application.fullName;
 
+  // Yeni dava oluştur
   const newCase = new Case({
-    applicationId: application._id,
-    lawyerId: lawyerId || application.lawyerId,
-    clientname: caseClientName,
-    otherlawyer,
-    courtName,
-    courtFileOrInvestigationNo,
-    caseTitle,
-    caseDescription,
-    documents,
-    documentTitle,
+    applicationId: application._id, // Başvuru ID'si
+    lawyerId: lawyerId || application.lawyerId, // Avukat ID'si
+    clientname: caseClientName, // Müvekkil adı
+    otherlawyer: "", // Boş bırakılıyor
+    courtName: "", // Boş bırakılıyor
+    courtFileOrInvestigationNo: "", // Boş bırakılıyor
+    caseTitle: "", // Boş bırakılıyor
+    caseDescription: "", // Boş bırakılıyor
+    documentTitle: "", // Boş bırakılıyor
+    documents: [], // Boş dizi olarak bırakılıyor
   });
 
+  // Dava veritabanına kaydediliyor
   await newCase.save();
 
+  // Başvurunun caseId alanını güncelle
   if (!application.caseId) {
     application.caseId = newCase._id as mongoose.Types.ObjectId;
     await application.save();
@@ -47,14 +44,18 @@ export const createCaseService = async (data: Partial<ICase>): Promise<ICase> =>
   return newCase;
 };
 
+
 // Tüm Davaları Listeleme
 export const getAllCasesService = async (filter: object = {}): Promise<ICase[]> => {
   const cases = await Case.find(filter)
-    .populate("applicationId", "fullName")
-    .populate("lawyerId", "name")
+  .populate({
+    path: 'applicationId',
+    select: 'fullName eventCategory', // Yalnızca gereken alanlar
+  })
+    .populate("lawyerId", "fullName")
     .exec();
 
-  return cases;
+  return cases;
 };
 
 // Belirli Bir Davayı Getirme

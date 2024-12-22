@@ -49,22 +49,22 @@ export const assignLawyerService = async (
   applicationId: string,
   lawyerId: string
 ): Promise<IApplication | null> => {
-  // Geçerli ID kontrolü
+
   if (!mongoose.isValidObjectId(applicationId) || !mongoose.isValidObjectId(lawyerId)) {
     throw new Error("Invalid applicationId or lawyerId");
   }
 
-  // Başvuruyu bul
+  
   const application = (await Application.findById(applicationId)) as IApplication;
 
   if (!application) {
     throw new Error("Application not found");
   }
 
-  // lawyerId'yi ObjectId formatına dönüştür
+  
   application.lawyerId = new mongoose.Types.ObjectId(lawyerId);
 
-  // Eğer caseId yoksa yeni bir dava oluştur
+
   if (!application.caseId) {
     const newCase = await createCaseService({
       applicationId: application._id as mongoose.Types.ObjectId,
@@ -76,11 +76,11 @@ export const assignLawyerService = async (
       caseDescription: application.eventDetails,
     });
 
-    // Dava ID'sini başvuruya ekle
+    
     application.caseId = newCase._id as mongoose.Types.ObjectId;
   }
 
-  // Güncellenmiş başvuruyu kaydet
+  
   const updatedApplication = await application.save();
 
   return updatedApplication;
