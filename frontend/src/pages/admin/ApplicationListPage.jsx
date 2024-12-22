@@ -8,7 +8,7 @@ import ApplicationForm from "../../components/modals/ApplicationFormModal";
 const ApplicationListPage = () => {
   const {
     applications,
-    fetchApplications, // Tüm başvuruları getirme fonksiyonu
+    fetchApplications, // Fetch all applications
     isModalOpen,
     openModal,
     closeModal,
@@ -16,28 +16,29 @@ const ApplicationListPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Sayfa yüklendiğinde başvuruları getirme
+  // Fetch applications on component mount
   useEffect(() => {
-    fetchApplications(); // Başvuruları API'den çek
+    fetchApplications();
   }, [fetchApplications]);
 
-  // Arama için filtreleme
+  // Filtering applications based on the search query
   const filteredApplications = applications.filter((item) => {
-    const lowerQuery = searchQuery.toLowerCase('tr');
-  
+    const lowerQuery = searchQuery.toLowerCase("tr");
+
     return (
-      (item.fullName && item.fullName.toLowerCase('tr').includes(lowerQuery)) || // fullName kontrolü
-      (item.eventCategory && item.eventCategory.toLowerCase('tr').includes(lowerQuery)) || // eventCategory kontrolü
-      (item.processedBy && item.processedBy.toLowerCase('tr').includes(lowerQuery)) || // processedBy kontrolü
-      (item.lawyerId && item.lawyerId.toLowerCase('tr').includes(lowerQuery)) // lawyerId kontrolü
+      (item.fullName && item.fullName.toLowerCase("tr").includes(lowerQuery)) || // Filter by fullName
+      (item.eventCategory &&
+        item.eventCategory.toLowerCase("tr").includes(lowerQuery)) || // Filter by eventCategory
+      (item.processedBy &&
+        item.processedBy.toLowerCase("tr").includes(lowerQuery)) || // Filter by processedBy
+      (item.lawyerId?.fullName &&
+        item.lawyerId.fullName.toLowerCase("tr").includes(lowerQuery)) // Filter by lawyerId.fullName
     );
   });
-  
-  
 
   return (
     <div className="rounded-xl flex flex-col items-center p-8 bg-gray-50 min-h-screen">
-      {/* Arama Kutusu */}
+      {/* Search Input */}
       <div className="mb-5 w-full max-w-4xl flex justify-between">
         <input
           type="text"
@@ -49,46 +50,59 @@ const ApplicationListPage = () => {
         <Button
           label="Yeni Kayıt"
           className="bg-amber-400 text-white px-4 py-2 rounded hover:bg-rose-800 transition"
-          onClick={openModal} // Modal açılır
+          onClick={openModal} // Open modal
         />
       </div>
 
-      <div className="w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden ">
-        <div className="bg-rose-800 text-white text-sm uppercase font-semibold px-6 py-4 ">
+      {/* Applications List */}
+      <div className="w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-rose-800 text-white text-sm uppercase font-semibold px-6 py-4">
           Başvuru Detayları
         </div>
         <div className="divide-y divide-gray-200">
           <div className="flex items-center bg-gray-100 px-6 py-3 text-gray-700 font-semibold text-sm">
-            <div className=" mr-5 w-20 text-center">Başvuru No</div>
+            <div className="mr-5 w-20 text-center">Başvuru No</div>
             <div className="mr-5 flex-1">Başvuran Ad-Soyad</div>
             <div className="flex-1">Hak İhlal Türü</div>
-            <div className="flex-1 ml-2 ">Atanan Avukat</div>
+            <div className="flex-1 ml-2">Atanan Avukat</div>
             <div className="flex-1 ml-2">Başvuruyu Ele Alan</div>
             <div className="w-24 text-center">Düzenle</div>
           </div>
 
           {filteredApplications.map((item, index) => (
-  <div key={item._id} className="flex items-center px-6 py-4 hover:bg-gray-50 transition">
-    <div className="w-20 mr-5 text-center text-gray-800">{index + 1}</div>
-    <div className="mr-5 flex-1 text-gray-800">{item.fullName}</div> {/* Ad Soyad */}
-    <div className="mr-3 flex-1 text-gray-800">{item.eventCategory || "Belirtilmemiş"}</div> {/* Hak İhlal Türü */}
-    <div className="flex-1 text-gray-800">{item.lawyerId?.fullName || "Atanmadı"}</div> {/* Avukat */}
-    <div className="flex-1 text-gray-800">{item.processedBy || "Belirtilmedi"}</div> {/* Başvuruyu Ele Alan */}
-    <div className="w-24 flex items-center justify-center gap-2">
-    <Button
-  label={<FcOpenedFolder size={28} />}
-  onClick={() =>
-    navigate(`/admin-page/application-list/details/${item._id}`)
-  } // update URL'sine yönlendirme yapılıyor
-/>
-
-    </div>
-  </div>
-))}
-
+            <div
+              key={item._id}
+              className="flex items-center px-6 py-4 hover:bg-gray-50 transition"
+            >
+              <div className="w-20 mr-5 text-center text-gray-800">
+                {index + 1}
+              </div>
+              <div className="mr-5 flex-1 text-gray-800">{item.fullName}</div>
+              <div className="mr-3 flex-1 text-gray-800">
+                {item.eventCategory || "Belirtilmemiş"}
+              </div>
+              <div className="flex-1 text-gray-800">
+                {item.lawyerId?.fullName || "Atanmadı"}
+              </div>
+              <div className="flex-1 text-gray-800">
+                {item.processedBy || "Belirtilmedi"}
+              </div>
+              <div className="w-24 flex items-center justify-center gap-2">
+                <Button
+                  label={<FcOpenedFolder size={28} />}
+                  onClick={() =>
+                    navigate(
+                      `/admin-page/application-list/details/${item._id}`
+                    )
+                  }
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
+      {/* Modal for Application Form */}
       {isModalOpen && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
