@@ -21,7 +21,7 @@ router.delete('/:id/documents/:index', removeDocumentController); // Döküman s
 
 
 // Ek Özellikler
-router.put("/:id/assign-lawyer", assignLawyer); // Avukat atama
+router.put("/:id/assign-lawyer", assignLawyer); // Avukat atama ve Dava oluşturma
 router.put("/:id/add-violation", addViolation); // Hak ihlali ekleme
 
 export default router;

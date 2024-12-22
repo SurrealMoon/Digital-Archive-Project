@@ -208,7 +208,6 @@ updateApplication: async (applicationId, updatedData) => {
 },
 
 // Avukat atama fonksiyonu
-// Avukat atama fonksiyonu
 assignLawyerToApplication: async (applicationId, lawyerId) => {
   try {
     // Avukatı başvuruya ata

@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Application, { IApplication } from "../models/application-model";
 import User from "../models/user-model";
+import { createCaseService } from "./case-service";
+
 
 // Yeni Başvuru Oluşturma
 export const createApplicationService = async (
@@ -10,7 +12,6 @@ export const createApplicationService = async (
   return await application.save();
 };
 
-// Tüm Başvuruları Listeleme
 // Tüm Başvuruları Listeleme
 export const getAllApplicationsService = async (): Promise<IApplication[]> => {
   return await Application.find()
@@ -43,7 +44,7 @@ export const deleteApplicationService = async (
   return await Application.findByIdAndDelete(id);
 };
 
-// Avukat Atama
+// Avukat Atama ve Dava Oluşturma
 export const assignLawyerService = async (
   applicationId: string,
   lawyerId: string
@@ -53,25 +54,39 @@ export const assignLawyerService = async (
     throw new Error("Invalid applicationId or lawyerId");
   }
 
-  // lawyerId'yi ObjectId formatına dönüştür
-  const lawyerObjectId = new mongoose.Types.ObjectId(lawyerId);
+  // Başvuruyu bul
+  const application = (await Application.findById(applicationId)) as IApplication;
 
-  // Güncelleme işlemi
-  const updatedApplication = await Application.findByIdAndUpdate(
-    applicationId,
-    { lawyerId: lawyerObjectId }, // Modeldeki alan adı
-    { new: true }
-  );
-
-  if (!updatedApplication) {
+  if (!application) {
     throw new Error("Application not found");
   }
+
+  // lawyerId'yi ObjectId formatına dönüştür
+  application.lawyerId = new mongoose.Types.ObjectId(lawyerId);
+
+  // Eğer caseId yoksa yeni bir dava oluştur
+  if (!application.caseId) {
+    const newCase = await createCaseService({
+      applicationId: application._id as mongoose.Types.ObjectId,
+      lawyerId: application.lawyerId as mongoose.Types.ObjectId,
+      clientname: application.fullName,
+      courtName: "",
+      courtFileOrInvestigationNo: "",
+      caseTitle: `Case for ${application.eventCategory}`,
+      caseDescription: application.eventDetails,
+    });
+
+    // Dava ID'sini başvuruya ekle
+    application.caseId = newCase._id as mongoose.Types.ObjectId;
+  }
+
+  // Güncellenmiş başvuruyu kaydet
+  const updatedApplication = await application.save();
 
   return updatedApplication;
 };
 
 // Hak İhlali Ekleme
-// services/application-service.ts
 export const addViolationService = async (
   applicationId: string,
   violationId: string
