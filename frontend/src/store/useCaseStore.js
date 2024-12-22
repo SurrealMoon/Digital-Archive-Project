@@ -76,6 +76,10 @@ const useCaseStore = create((set, get) => ({
     }
   },
 
+  getCaseById: (id) => {
+    const cases = get().cases;
+    return cases.find((caseItem) => caseItem.id === id) || null;
+  },
   updateCase: async (id) => {
     try {
       const formData = get().formData;
