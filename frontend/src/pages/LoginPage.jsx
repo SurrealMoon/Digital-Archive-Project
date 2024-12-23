@@ -12,12 +12,13 @@ const LoginPage = () => {
   const error = useAuthStore((state) => state.error);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    const success = await login(username, password);  // Role'i artık authStore'da belirliyoruz
+  const handleLogin = async (e) => {
+    if (e) e.preventDefault(); // Formun varsayılan davranışını engelle
+    const success = await login(username, password);
     if (success) {
       alert("Giriş başarılı!");
-      const role = localStorage.getItem("role");  // Roleyi localStorage'dan alıyoruz
-      navigate(role === "admin" ? "/admin-page" : "/lawyer-page"); // Yönlendirmeyi role'ye göre yapıyoruz
+      const role = localStorage.getItem("role");
+      navigate(role === "admin" ? "/admin-page" : "/lawyer-page");
     } else {
       alert("Giriş başarısız: " + error);
     }
@@ -39,30 +40,33 @@ const LoginPage = () => {
           Hak İhlali Takip Sistemi
         </h2>
 
-        {/* Kullanıcı Adı */}
-        <InputField
-          placeholder="Kullanıcı Adı"
-          type="text"
-          value={username}
-          onChange={setUsername} // Direkt değer döner
-          className="mb-4 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
-        />
+        {/* Form */}
+        <form onSubmit={handleLogin}>
+          {/* Kullanıcı Adı */}
+          <InputField
+            placeholder="Kullanıcı Adı"
+            type="text"
+            value={username}
+            onChange={setUsername}
+            className="mb-4 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
+          />
 
-        {/* Şifre */}
-        <InputField
-          placeholder="Şifre"
-          type="password"
-          value={password}
-          onChange={setPassword} // Direkt değer döner
-          className="mb-6 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
-        />
+          {/* Şifre */}
+          <InputField
+            placeholder="Şifre"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            className="mb-6 w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-rose-700"
+          />
 
-        {/* Giriş Butonu */}
-        <Button
-          label="Sisteme Giriş"
-          className="w-full py-2 bg-rose-700 text-white rounded hover:bg-rose-800 focus:ring-2 focus:ring-rose-700"
-          onClick={handleLogin}
-        />
+          {/* Giriş Butonu */}
+          <Button
+            label="Sisteme Giriş"
+            type="submit" // Submit tipi olarak ayarlandı
+            className="w-full py-2 bg-rose-700 text-white rounded hover:bg-rose-800 focus:ring-2 focus:ring-rose-700"
+          />
+        </form>
       </div>
     </div>
   );
