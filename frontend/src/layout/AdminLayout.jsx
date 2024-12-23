@@ -6,9 +6,17 @@ import { GiArchiveResearch } from "react-icons/gi";
 import { BsPersonFillAdd } from "react-icons/bs";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
-import useAuthStore from "../store/useAuthStore"; // Auth store'dan rol ve logout fonksiyonlarını alacağız
+import useAuthStore from "../store/useAuthStore"; 
+import { useNavigate } from "react-router-dom";
+
 
 const MainSidebar = ({ isOpen, toggleMenu, role }) => {
+  const navigate = useNavigate();
+
+const handleLogout = () => {
+  useAuthStore.getState().logout(); // Mevcut çıkış fonksiyonunu çağır
+  navigate("/login"); // Kullanıcıyı /login sayfasına yönlendir
+};
   return (
     <div
       className={`bg-amber-50 h-screen p-4 border-r flex flex-col justify-between transition-all duration-300 ${
@@ -80,14 +88,13 @@ const MainSidebar = ({ isOpen, toggleMenu, role }) => {
 
       {/* Logout Button */}
       <div className="mt-auto">
-        <button
-          onClick={() => {
-            useAuthStore.getState().logout();
-          }}
-          className="block bg-rose-800 text-white font-semibold text-center py-2 rounded hover:bg-rose-600 w-full"
-        >
-          {isOpen ? "Çıkış Yap" : <FaTimes className="mx-auto" />}
-        </button>
+      <button
+  onClick={handleLogout}
+  className="block bg-rose-800 text-white font-semibold text-center py-2 rounded hover:bg-rose-600 w-full"
+>
+  {isOpen ? "Çıkış Yap" : <FaTimes className="mx-auto" />}
+</button>
+
       </div>
     </div>
   );
