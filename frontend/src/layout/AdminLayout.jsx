@@ -8,6 +8,8 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { FaTimes } from "react-icons/fa";
 import useAuthStore from "../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import HitasLogo from "../assets/HitasLogo.png";
+
 
 
 const MainSidebar = ({ isOpen, toggleMenu, role }) => {
@@ -34,7 +36,7 @@ const MainSidebar = ({ isOpen, toggleMenu, role }) => {
         </div>
         <div className="flex justify-center">
           <img
-            src="/src/assets/HitasLogo.png"
+            src={HitasLogo}
             alt="Logo"
             className="w-45" // Increase logo size
           />
