@@ -143,6 +143,22 @@ const useApplicationStore = create((set, get) => ({
     }
   },
 
+  loadFormData: () => {
+    try {
+      const savedFormData = JSON.parse(localStorage.getItem("formData"));
+      if (savedFormData) {
+        set((state) => ({
+          formData: {
+            ...state.formData,
+            ...savedFormData, // localStorage'dan gelen verileri mevcut formData ile birleştir
+          },
+        }));
+      }
+    } catch (error) {
+      console.error("loadFormData: localStorage'dan veri alınamadı.", error);
+    }
+  },
+
   // Form verisini güncelleme
   setFormData: (data) =>
     set((state) => {
