@@ -1,22 +1,21 @@
-import React, { useState } from "react";
-import useCaseStore from "../../store/useCaseStore";
-import Button from "../Button";
+import React from "react";
+import Modal from "../Modal";
 import InputField from "../InputField";
 import TextArea from "../TextArea";
-import Modal from "../Modal";
+import useCaseStore from "../../store/useCaseStore";
 
-const AddCaseDetails = () => {
+const AddCaseDetailsModal = () => {
   const {
+    isModalOpen,
     formData,
     setFormData,
+    closeModal,
     addCase,
     updateCase,
-    closeModal,
     resetFormData,
   } = useCaseStore();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const isEditMode = Boolean(formData.id); // Determine mode based on presence of an ID
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
@@ -24,8 +23,8 @@ const AddCaseDetails = () => {
 
   const handleFileChange = (files) => {
     const updatedFiles = Array.from(files).map((file) => ({
-      fileUrl: "", // Başlangıçta boş bırakılır, S3'e yüklendikten sonra güncellenir
-      documentTitle: "", // Kullanıcı tarafından girilir
+      fileUrl: "",
+      documentTitle: "",
     }));
     setFormData({ documents: [...formData.documents, ...updatedFiles] });
   };
@@ -42,7 +41,6 @@ const AddCaseDetails = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("Form Gönderilirkenki Data:", formData);
     if (isEditMode) {
       await updateCase();
       alert("Dava başarıyla güncellendi!");
@@ -51,103 +49,87 @@ const AddCaseDetails = () => {
       alert("Dava başarıyla kaydedildi!");
     }
     resetFormData();
-    closeModalHandler();
-  };
-
-  const openModal = (editMode = false) => {
-    setIsEditMode(editMode);
-    setIsModalOpen(true);
-  };
-
-  const closeModalHandler = () => {
-    setIsModalOpen(false);
     closeModal();
   };
 
   return (
-    <div>
-      <Button
-        label="Yeni Dava Kaydı Ekle"
-        onClick={() => openModal(false)}
-        className="bg-yellow-400 text-white hover:bg-emerald-600 w-full"
-        style={{ marginTop: "20px" }}
-      />
-
-      <Modal
-        isOpen={isModalOpen}
-        title={isEditMode ? "Dava Güncelle" : "Yeni Dava Kaydı"}
-        onClose={closeModalHandler}
-        onSubmit={handleSubmit}
-      >
+    <Modal
+      isOpen={isModalOpen}
+      title={isEditMode ? "Dava Güncelle" : "Yeni Dava Kaydı"}
+      onClose={closeModal}
+      onSubmit={handleSubmit}
+    >
+      <div className="space-y-4">
+        {/* Müvekkil Ad-Soyad */}
         <InputField
           label="Müvekkil Ad-Soyad"
           value={formData.clientname}
           onChange={handleChange("clientname")}
           placeholder="Müvekkil adını ve soyadını giriniz"
         />
+        {/* Yetkili Diğer Avukat */}
         <InputField
           label="Yetkili Diğer Avukat"
           value={formData.otherlawyer}
           onChange={handleChange("otherlawyer")}
           placeholder="Varsa yetkili diğer avukat adını giriniz"
         />
+        {/* Mahkeme Adı */}
         <InputField
           label="Mahkeme Adı"
           value={formData.courtName}
           onChange={handleChange("courtName")}
-          placeholder="Mahkeme adını veya CBS'yi giriniz"
+          placeholder="Mahkeme adını giriniz"
         />
+        {/* Dosya No */}
         <InputField
           label="Mahkeme Dosya Numarası"
           value={formData.courtFileOrInvestigationNo}
           onChange={handleChange("courtFileOrInvestigationNo")}
           placeholder="Mahkeme dosya numarasını giriniz"
         />
+        {/* Başlık */}
         <InputField
           label="Dava Başlığı"
           value={formData.caseTitle}
           onChange={handleChange("caseTitle")}
           placeholder="Dava başlığını giriniz"
         />
+        {/* Açıklama */}
         <TextArea
           label="Dava Açıklaması"
           value={formData.caseDescription}
           onChange={handleChange("caseDescription")}
           placeholder="Dava açıklamasını giriniz"
         />
-        <div style={{ marginBottom: "15px" }}>
-          <label style={{ display: "block", marginBottom: "5px" }}>Döküman Ekleme:</label>
+        {/* Dosya Yükleme */}
+        <div>
+          <label className="block font-semibold mb-1">Döküman Ekleme</label>
           <input
             type="file"
             multiple
             onChange={(e) => handleFileChange(e.target.files)}
-            style={{ display: "block", marginBottom: "10px" }}
           />
-          {formData.documents.length > 0 ? (
-            formData.documents.map((doc, index) => (
-              <div key={index} style={{ marginBottom: "10px" }}>
-                <InputField
-                  label="Döküman Başlığı"
-                  value={doc.documentTitle}
-                  onChange={(value) => handleDocumentTitleChange(index, value)}
-                  placeholder="Döküman başlığını giriniz"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveFile(index)}
-                  style={{ marginLeft: "10px", color: "red", cursor: "pointer" }}
-                >
-                  Sil
-                </button>
-              </div>
-            ))
-          ) : (
-            <p>Henüz dosya yüklenmedi.</p>
-          )}
+          {formData.documents.map((doc, index) => (
+            <div key={index} className="flex items-center justify-between mt-2">
+              <InputField
+                label="Döküman Başlığı"
+                value={doc.documentTitle}
+                onChange={(value) => handleDocumentTitleChange(index, value)}
+              />
+              <button
+                type="button"
+                onClick={() => handleRemoveFile(index)}
+                className="text-red-500 hover:underline"
+              >
+                Sil
+              </button>
+            </div>
+          ))}
         </div>
-      </Modal>
-    </div>
+      </div>
+    </Modal>
   );
 };
 
-export default AddCaseDetails;
+export default AddCaseDetailsModal;

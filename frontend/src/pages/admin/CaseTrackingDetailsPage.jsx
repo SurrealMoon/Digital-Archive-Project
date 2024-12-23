@@ -1,22 +1,24 @@
+// CaseDetailsPage.js
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useCaseStore from "../../store/useCaseStore";
+import AddCaseDetailsModal from "../../components/modals/AddCaseDetailsModal";
 
 const CaseDetailsPage = () => {
-  const { id } = useParams(); // Router'dan case ID alınır
-  const { getCaseById } = useCaseStore(); // Store'dan API ile bağlantılı case fetch fonksiyonu
-  const [caseData, setCaseData] = useState(null); // Dava detaylarını tutar
-  const [loading, setLoading] = useState(true); // Yüklenme durumunu yönetir
-  const [error, setError] = useState(null); // Hata durumunu tutar
+  const { id } = useParams();
+  const { getCaseById, openModal } = useCaseStore();
+  const [caseData, setCaseData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCaseDetails = async () => {
       setLoading(true);
       setError(null);
       try {
-        const fetchedCase = await getCaseById(id); // API çağrısı yapılır
+        const fetchedCase = await getCaseById(id);
         if (fetchedCase) {
-          setCaseData(fetchedCase); // Case verisini state'e kaydet
+          setCaseData(fetchedCase);
         } else {
           setError("Dava bulunamadı.");
         }
@@ -46,7 +48,18 @@ const CaseDetailsPage = () => {
   const applicationData = caseData.applicationId;
 
   return (
-    <div className="flex flex-col items-center p-8 bg-gray-50 min-h-screen">
+    <div className="flex flex-col items-center p-8 bg-gray-50 min-h-screen relative">
+      {/* Sağ Üstteki Buton */}
+      <button
+        onClick={openModal}
+        className="absolute top-4 right-4 bg-fuchsia-400 text-white px-4 py-1 rounded hover:bg-emerald-600 transition"
+      >
+        Dava Detay Ekle
+      </button>
+
+      {/* Modal */}
+      <AddCaseDetailsModal />
+
       {/* Başvuru Detayları */}
       <h1 className="text-2xl font-bold text-gray-800">Başvuru Detayları</h1>
       <div className="mt-6 w-full max-w-4xl bg-white shadow-xl rounded-lg p-6">
