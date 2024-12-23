@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node dist/app.js",
     "dev": "ts-node-dev src/app.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "deploy": "node ./dist/app.js",
+    "build-start": "npm run build && npm run deploy" 
   },
   "keywords": [],
   "author": "",
