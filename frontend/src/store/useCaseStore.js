@@ -87,10 +87,18 @@ const useCaseStore = create((set, get) => ({
     }
   },
 
-  getCaseById: (id) => {
-    const cases = get().cases;
-    return cases.find((caseItem) => caseItem.id === id) || null;
+  getCaseById: async (id) => {
+    try {
+      const response = await axiosInstance.get(`/cases/${id}`); // Belirli bir davayı getir
+      return response.data || null; // API'den gelen davayı döndür
+    } catch (error) {
+      console.error("Error fetching case by ID:", error);
+      set({ error: "Dava getirilemedi." });
+      return null;
+    }
   },
+  
+
   updateCase: async (id) => {
     try {
       const formData = get().formData;

@@ -17,12 +17,13 @@ const CaseTrackingListPage = () => {
   const filteredCases = cases.filter((item) => {
     const lowerQuery = searchQuery.toLowerCase("tr");
     return (
-      (item.name && item.name.toLowerCase("tr").includes(lowerQuery)) ||
-      (item.category && item.category.toLowerCase("tr").includes(lowerQuery)) ||
-      (item.courtName && item.courtName.toLowerCase("tr").includes(lowerQuery)) ||
-      (item.lawyerName && item.lawyerName.toLowerCase("tr").includes(lowerQuery))
+      (item.name || "").toLowerCase("tr").includes(lowerQuery) ||
+      (item.eventCategory || "").toLowerCase("tr").includes(lowerQuery) ||
+      (item.courtName || "").toLowerCase("tr").includes(lowerQuery) ||
+      (item.lawyerName || "").toLowerCase("tr").includes(lowerQuery)
     );
   });
+  
 
   return (
     <div className="flex flex-col items-center p-8 bg-gray-50 min-h-screen">
@@ -68,8 +69,8 @@ const CaseTrackingListPage = () => {
               >
                 <div className="w-20 mr-5 text-center text-gray-800">{item.name}</div>
                 <div className="mr-5 flex-1 text-gray-800">{item.name}</div>
-                <div className="flex-1 text-gray-800">{item.laywerName|| "Belirtilmemiş"}</div>
-                <div className="mr-3 flex-1 text-gray-800">{item.category || "Belirtilmemiş"}</div>
+                <div className="flex-1 text-gray-800">{item.lawyerName || "Belirtilmemiş"}</div>
+                <div className="mr-3 flex-1 text-gray-800">{item.eventCategory || "Belirtilmemiş"}</div>
                 <div className="flex-1 text-gray-800">{item.courtName || "Belirtilmemiş"}</div>
                 <div className="flex-1 text-gray-800">{item.fileNumber || "Belirtilmemiş"}</div>
                 <div className="w-24 flex items-center justify-center gap-2">

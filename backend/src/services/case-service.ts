@@ -60,7 +60,17 @@ export const getAllCasesService = async (filter: object = {}): Promise<ICase[]> 
 
 // Belirli Bir Davayı Getirme
 export const getCaseByIdService = async (id: string): Promise<ICase | null> => {
-  return await Case.findById(id).populate("lawyerId", "fullName email phone role");
+  return await Case.findById(id)
+    .populate({
+      path: 'applicationId',
+      select: 'fullName citizenId phone email address applicationDate eventCategory eventSummary eventDetails documents', // Başvuru bilgileri
+    })
+    .populate({
+      path: 'lawyerId',
+      select: 'fullName email phone role cases', // Avukat bilgileri
+    })
+  
+    .exec();
 };
 
 // Dava Güncelleme

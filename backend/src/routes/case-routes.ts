@@ -15,7 +15,7 @@ const router = express.Router();
 router.post("/create", protect, restrictTo("admin"), createCase); // Admin dava oluşturabilir
 router.get("/getallcases", protect, restrictTo("admin", "lawyer"), getAllCases); // Tüm davaları görüntüleyebilir
 router.get("/:id", protect, restrictTo("admin", "lawyer"), getCaseById); // Belirli bir davayı görüntüleyebilir
-router.put("/:id", protect, restrictTo("admin", "lawyer"), updateCase); // Dava güncelleyebilir
-router.delete("/:id", protect, restrictTo("admin"), deleteCase); // Sadece admin dava silebilir
+router.put("/:id/update", protect, restrictTo("admin", "lawyer"), updateCase); // Dava güncelleyebilir
+router.delete("/delete/:id", protect, restrictTo("admin"), deleteCase); // Sadece admin dava silebilir
 
 export default router;
