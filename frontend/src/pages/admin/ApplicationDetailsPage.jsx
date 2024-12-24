@@ -106,61 +106,56 @@ const ApplicationDetailsPage = () => {
           </div>
 
           <div className="mt-6 w-full max-w-4xl bg-white shadow-xl rounded-lg p-6">
-            <div className="mb-4">
-              <span className="font-semibold text-gray-800">Ad Soyad:</span>{" "}
-              {formData.fullName}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold text-gray-800">Kimlik Numarası:</span>{" "}
-              {formData.citizenId}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold text-gray-800">Telefon:</span>{" "}
-              {formData.phone}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold text-gray-800">E-posta:</span>{" "}
-              {formData.email}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold text-gray-800">Adres:</span>{" "}
-              {formData.address}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold text-gray-800">Başvuru Tarihi:</span>{" "}
-              {new Date(formData.applicationDate).toLocaleDateString()}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold text-gray-800">Başlık:</span>{" "}
-              {formData.eventSummary}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold text-gray-800">Detaylar:</span>{" "}
-              {formData.eventDetails}
-            </div>
-            <div className="mb-4">
-  <span className="font-semibold text-gray-800">Belgeler:</span>
-  {formData.documents?.length > 0 ? (
-    <ul>
-      {formData.documents.map((doc, index) => (
-        <li key={index}>
-          <a
-            href={doc.fileUrl} // doc yerine doc.fileUrl kullanın
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline"
-          >
-            {doc.documentTitle || doc.fileUrl} 
-            {/* doc objesini doğrudan yazmayın, metin alanlarını kullanın */}
-          </a>
-        </li>
-      ))}
-    </ul>
-  ) : (
-    "Belge bulunamadı"
-  )}
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">Ad-Soyad:</span> {formData.fullName}
+  </div>
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">T.C. Kimlik Numarası:</span> {formData.citizenId}
+  </div>
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">Telefon:</span> {formData.phone}
+  </div>
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">E-posta:</span> {formData.email}
+  </div>
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">Adres:</span> {formData.address}
+  </div>
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">Başvuru Tarihi:</span> {new Date(formData.applicationDate).toLocaleDateString()}
+  </div>
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">Olay Kategorisi:</span> {formData.eventCategory}
+  </div>
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">Başvurma Nedeni (Olay Başlığı):</span> {formData.eventSummary}
+  </div>
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">Olay Özeti:</span> {formData.eventDetails}
+  </div>
+  <div className="mb-4">
+    <span className="font-semibold text-gray-800">Belgeler:</span>
+    {formData.documents?.length > 0 ? (
+      <ul>
+        {formData.documents.map((doc, index) => (
+          <li key={index}>
+            <a
+              href={doc.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              {doc.documentTitle || "Başlıksız Belge"}
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      "Belge bulunamadı"
+    )}
+  </div>
 </div>
-          </div>
+
 
           <div className="mt-6 w-full flex space-x-4">
             

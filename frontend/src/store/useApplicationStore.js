@@ -125,38 +125,41 @@ const useApplicationStore = create((set, get) => ({
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("documentTitle", documentTitle);
+      formData.append("documentTitle", documentTitle || file.name);
   
+      // API isteği
       const response = await axiosInstance.post(
         `/applications/${applicationId}/upload`,
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data", // FormData için gerekli header
-          },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
   
-      const { fileUrl } = response.data;
+      // Yanıtı logla
+      console.log("Backend Yanıtı:", response.data);
   
-      // Store'daki veriyi güncelle
-      set((state) => ({
-        formData: {
-          ...state.formData,
-          documents: [
-            ...state.formData.documents,
-            { fileUrl, documentTitle, uploadedAt: new Date() },
-          ],
-        },
-        error: null,
-      }));
+      // fileUrl'yi doğru yerden al
+      const updatedApplication = response.data.updatedApplication;
+      const documents = updatedApplication?.documents || [];
+      const lastDocument = documents[documents.length - 1]; // Son eklenen belge
   
-      console.log("Dosya başarıyla yüklendi:", fileUrl);
+      if (!lastDocument || !lastDocument.fileUrl) {
+        console.error("Backend yanıtında fileUrl eksik:", response.data);
+        throw new Error("Backend'den geçerli bir fileUrl alınamadı!");
+      }
+  
+      return {
+        fileUrl: lastDocument.fileUrl,
+        documentTitle: lastDocument.documentTitle || file.name,
+      };
     } catch (error) {
-      set({ error: "Dosya yükleme sırasında bir hata oluştu." });
-      console.error(error);
+      console.error(
+        "Dosya yükleme sırasında hata oluştu:",
+        error.response?.data || error
+      );
+      throw error;
     }
-  },
+  },  
+
 
   // Başvurudan belge silme
 removeDocumentFromApplication: async (applicationId, index) => {
@@ -183,27 +186,58 @@ removeDocumentFromApplication: async (applicationId, index) => {
   }
 },
 
-// Başvuruyu güncelleme
 updateApplication: async (applicationId, updatedData) => {
   try {
+    const newFiles = updatedData.documents.filter((doc) => doc.file instanceof File);
+    const existingDocuments = updatedData.documents.filter((doc) => !(doc.file instanceof File));
+
+    for (const fileData of newFiles) {
+      const formData = new FormData();
+      formData.append("file", fileData.file);
+      formData.append("documentTitle", fileData.documentTitle || "Başlıksız Belge");
+
+      try {
+        const uploadResponse = await axiosInstance.post(
+          `/applications/${applicationId}/upload`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+
+        const { fileUrl } = uploadResponse.data;
+
+        if (fileUrl) {
+          existingDocuments.push({
+            fileUrl,
+            documentTitle: fileData.documentTitle,
+          });
+        } else {
+          console.error("Dosya yükleme sırasında fileUrl alınamadı!");
+        }
+      } catch (uploadError) {
+        console.error("Dosya yükleme sırasında hata oluştu:", uploadError);
+      }
+    }
+
     const response = await axiosInstance.put(
       `/applications/details/${applicationId}`,
-      updatedData
+      {
+        ...updatedData,
+        documents: existingDocuments,
+      }
     );
 
-    // Güncellenmiş veriyi al ve uygulama listesini güncelle
     set((state) => ({
       applications: state.applications.map((app) =>
         app._id === applicationId ? response.data : app
       ),
-      formData: response.data, // Güncel veriyi formda da saklayalım
-      error: null,
+      formData: response.data,
     }));
 
     console.log("Başvuru başarıyla güncellendi:", response.data);
   } catch (error) {
-    set({ error: "Başvuru güncellenirken bir hata oluştu." });
-    console.error(error);
+    console.error("Başvuru güncellenirken hata:", error);
   }
 },
 

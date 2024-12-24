@@ -116,7 +116,7 @@ const ApplicationFormModal = () => {
         >
           {/* Ad Soyad */}
           <InputField
-            label="Başvuran Ad-Soyad"
+            label="Ad-Soyad"
             value={formData.fullName}
             onChange={handleChange("fullName")}
             placeholder="Adınızı ve soyadınızı giriniz"
@@ -124,28 +124,29 @@ const ApplicationFormModal = () => {
 
           {/* T.C. Kimlik */}
           <InputField
-            label="Başvuran T.C. Kimlik No"
+            label="T.C. Kimlik Numarası"
             value={formData.citizenId}
             onChange={handleChange("citizenId")}
             placeholder="T.C. Kimlik Numaranızı giriniz"
+
           />
 
-          {/* E-posta */}
-          <InputField
-            label="E-mail"
-            value={formData.email}
-            onChange={handleChange("email")}
-            placeholder="E-posta adresinizi giriniz"
-            type="email"
-          />
-
-          {/* Telefon */}
-          <InputField
-            label="Telefon No"
+                    {/* Telefon */}
+                    <InputField
+            label="Telefon"
             value={formData.phone}
             onChange={handleChange("phone")}
             placeholder="Telefon numaranızı giriniz"
             type="tel"
+          />
+
+          {/* E-posta */}
+          <InputField
+            label="E-posta"
+            value={formData.email}
+            onChange={handleChange("email")}
+            placeholder="E-posta adresinizi giriniz"
+            type="email"
           />
 
           {/* Adres */}
@@ -177,7 +178,7 @@ const ApplicationFormModal = () => {
 
           {/* Olay Başlık */}
           <InputField
-            label="Başvurma Nedeni (Olay Başlık)"
+            label="Başvurma Nedeni (Olay Başlığı)"
             value={formData.eventSummary}
             onChange={handleChange("eventSummary")}
             placeholder="Başvuru nedeninizi giriniz"
@@ -194,7 +195,7 @@ const ApplicationFormModal = () => {
 
           {/* Döküman Başlığı */}
           <InputField
-            label="Döküman Bilgisi"
+            label="Döküman Başlığı"
             value={formData.documentTitle}
             onChange={handleChange("documentTitle")}
             placeholder="Döküman bilgilerini giriniz"

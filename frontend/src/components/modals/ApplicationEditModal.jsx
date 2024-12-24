@@ -14,10 +14,9 @@ const ApplicationEditModal = ({ application, isOpen, onClose }) => {
     resetFormData,
     removeDocumentFromApplication,
     updateApplication,
-    addDocumentToApplication, // Dosya yükleme fonksiyonu
+    addDocumentToApplication,
   } = useApplicationStore();
 
-  // Modal ilk açıldığında form verisini doldur
   useEffect(() => {
     if (isOpen && application) {
       setFormData({
@@ -32,46 +31,57 @@ const ApplicationEditModal = ({ application, isOpen, onClose }) => {
         eventCategory: application.eventCategory || "",
         eventSummary: application.eventSummary || "",
         eventDetails: application.eventDetails || "",
-        documents: application.documents || [], // Belgeleri de al
+        documents: application.documents || [],
       });
     }
-    // Modal kapanırken formu sıfırla
     if (!isOpen) resetFormData();
-  }, [isOpen]); // Bağımlılık olarak sadece isOpen kullanıldı.
+  }, [isOpen]);
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
   };
 
-  const handleFileChange = (files) => {
-    Array.from(files).forEach((file) => {
-      addDocumentToApplication(application._id, file, file.name)
-        .then(() => {
-          console.log("Dosya başarıyla yüklendi:", file.name);
-        })
-        .catch((error) => {
-          console.error("Dosya yükleme hatası:", error);
-        });
-    });
-  };
-
-  const handleRemoveFile = async (index) => {
-    try {
-      if (application?._id) {
-        await removeDocumentFromApplication(application._id, index);
-        console.log("Belge başarıyla silindi");
+  // Dosya yükleme işlemi
+  const handleFileChange = async (files) => {
+    const uploadedFiles = [];
+    const failedFiles = [];
+  
+    for (const file of files) {
+      try {
+        const uploadResponse = await addDocumentToApplication(application._id, file, file.name);
+        uploadedFiles.push(uploadResponse);
+      } catch (error) {
+        console.error(`Dosya yüklenemedi: ${file.name}`, error);
+        failedFiles.push(file.name);
       }
-    } catch (error) {
-      console.error("Belge silinirken bir hata oluştu:", error);
+    }
+  
+    if (uploadedFiles.length > 0) {
+      const updatedDocuments = [
+        ...formData.documents,
+        ...uploadedFiles.map(({ fileUrl, documentTitle }) => ({
+          fileUrl,
+          documentTitle,
+          uploadedAt: new Date(),
+        })),
+      ];
+  
+      setFormData({ documents: updatedDocuments });
+      console.log("Başarıyla yüklenen dosyalar:", uploadedFiles);
+    }
+  
+    if (failedFiles.length > 0) {
+      alert(`Bazı dosyalar yüklenemedi: ${failedFiles.join(", ")}`);
     }
   };
-
+  
+  
   const handleSubmit = async () => {
     try {
       if (application?._id) {
         await updateApplication(application._id, formData);
         console.log("Başvuru başarıyla güncellendi!");
-        onClose(); // Modalı kapat
+        onClose();
       }
     } catch (error) {
       console.error("Başvuru güncellenirken bir hata oluştu:", error);
@@ -84,14 +94,19 @@ const ApplicationEditModal = ({ application, isOpen, onClose }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} title="Başvuru Düzenle" onClose={handleClose} onSubmit={handleSubmit}>
+    <Modal
+      isOpen={isOpen}
+      title="Başvuru Düzenle"
+      onClose={handleClose}
+      onSubmit={handleSubmit}
+    >
       <InputField
-        label="Ad Soyad"
+        label="Ad-Soyad"
         value={formData.fullName || ""}
         onChange={handleChange("fullName")}
       />
       <InputField
-        label="Kimlik Numarası"
+        label="T.C. Kimlik Numarası"
         value={formData.citizenId || ""}
         onChange={handleChange("citizenId")}
       />
@@ -119,31 +134,55 @@ const ApplicationEditModal = ({ application, isOpen, onClose }) => {
         />
       </div>
       <CategoryDropdown
-        label="Kategori"
+        label="Olay Kategorisi"
         selected={formData.eventCategory || ""}
         onChange={(value) => handleChange("eventCategory")(value)}
       />
       <TextArea
-        label="Başlık"
+        label="Başvurma Nedeni (Olay Başlığı)"
         value={formData.eventSummary || ""}
         onChange={(value) => handleChange("eventSummary")(value)}
       />
       <TextArea
-        label="Detaylar"
+        label="Olay Özeti"
         value={formData.eventDetails || ""}
         onChange={(value) => handleChange("eventDetails")(value)}
       />
+      <InputField
+        label="Döküman Başlığı"
+        value={formData.documentTitle || ""}
+        onChange={handleChange("documentTitle")}
+      />
       <div>
         <label>Belgeler</label>
-        <input type="file" multiple onChange={(e) => handleFileChange(e.target.files)} />
-        {Array.isArray(formData.documents) && formData.documents.length > 0 ? (
+        <input
+          type="file"
+          multiple
+          onChange={(e) => handleFileChange(e.target.files)}
+        />
+        {formData.documents.length > 0 ? (
           formData.documents.map((doc, index) => (
-            <div key={index} className="flex items-center">
-              <span>{doc.documentTitle}</span> {/* Belge başlığını göster */}
+            <div key={index} style={{ marginBottom: "10px" }}>
+              {doc.fileUrl ? (
+                <a
+                  href={doc.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "blue", textDecoration: "underline" }}
+                >
+                  {doc.documentTitle || "Dosya"}
+                </a>
+              ) : (
+                <span style={{ color: "red" }}>URL Eksik</span>
+              )}
               <button
                 type="button"
-                onClick={() => handleRemoveFile(index)}
-                style={{ marginLeft: "10px", color: "red" }}
+                onClick={() => removeDocumentFromApplication(application._id, index)}
+                style={{
+                  marginLeft: "10px",
+                  color: "red",
+                  cursor: "pointer",
+                }}
               >
                 Sil
               </button>
