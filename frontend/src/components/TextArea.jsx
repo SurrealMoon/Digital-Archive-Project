@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TextArea = ({ label, value, onChange, maxLength, placeholder, style }) => (
+const TextArea = ({ label, value, onChange, maxLength = 500, placeholder, style }) => (
   <div style={{ marginBottom: '15px' }}>
     <label style={{ display: 'block', marginBottom: '5px' }}>
       {label}

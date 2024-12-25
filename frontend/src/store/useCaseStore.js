@@ -41,8 +41,8 @@ const useCaseStore = create((set, get) => ({
           eventDetails: caseItem.applicationId?.eventDetails || "Belirtilmemiş", // Olay detayları
           documents: caseItem.applicationId?.documents || [], // Başvuru belgeleri
           lawyerName: caseItem.lawyerId?.fullName || "Belirtilmemiş", // Atanan avukat
-          clientname: caseItem.clientname || "Belirtilmemiş", // Müvekkil adı
-          otherlawyer: caseItem.otherlawyer || "Belirtilmemiş", // Diğer avukat
+          clientname: caseItem.clientname , // Müvekkil adı
+          otherlawyer: caseItem.otherlawyer , // Diğer avukat
           courtName: caseItem.courtName || "Belirtilmemiş", // Mahkeme adı
           courtFileOrInvestigationNo:
             caseItem.courtFileOrInvestigationNo || "Belirtilmemiş", // Mahkeme dosya numarası
@@ -99,33 +99,20 @@ const useCaseStore = create((set, get) => ({
   },
   
 
-  updateCase: async (id) => {
+  updateCase: async (id, formData) => {
+    formData.applicationId = 123
+    console.log(formData.applicationId)
     try {
-      const formData = get().formData;
-
-      const response = await axiosInstance.put(`/cases/${id}/update`, formData);
+  
+      // Burada id'yi doğru şekilde endpoint'e eklediğinizden emin olun
+      const response = await axiosInstance.put(`/cases/update/${id}`, formData);
       const updatedCase = response.data;
-
+  
       set((state) => ({
         cases: state.cases.map((caseItem) =>
-          caseItem.id === id
-            ? {
-                id: updatedCase._id,
-                applicationId: updatedCase.applicationId || "Belirtilmemiş",
-                lawyerId: updatedCase.lawyerId || "Belirtilmemiş",
-                clientname: updatedCase.clientname || "Belirtilmemiş",
-                otherlawyer: updatedCase.otherlawyer || "Belirtilmemiş",
-                courtName: updatedCase.courtName || "Belirtilmemiş",
-                courtFileOrInvestigationNo:
-                  updatedCase.courtFileOrInvestigationNo || "Belirtilmemiş",
-                caseTitle: updatedCase.caseTitle || "Belirtilmemiş",
-                caseDescription: updatedCase.caseDescription || "Belirtilmemiş",
-                documents: updatedCase.documents || [],
-              }
-            : caseItem
+          caseItem.id === id ? { ...caseItem, ...updatedCase } : caseItem
         ),
         formData: {
-          applicationId: "",
           clientname: "",
           otherlawyer: "",
           courtName: "",
@@ -136,14 +123,14 @@ const useCaseStore = create((set, get) => ({
         },
         error: null,
       }));
-
+  
       console.log("Dava başarıyla güncellendi:", updatedCase);
     } catch (error) {
       console.error("Dava güncellenirken hata oluştu:", error);
       set({ error: "Dava güncellenirken bir hata oluştu." });
     }
   },
-
+  
   getCaseByApplicationId: (applicationId) => {
     const cases = get().cases;
     return cases.find((caseItem) => caseItem.applicationId === applicationId);

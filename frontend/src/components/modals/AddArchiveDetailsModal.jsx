@@ -12,6 +12,8 @@ const ArchiveModal = () => {
     archiveData,
     closeModal,
     updateArchiveData,
+    resetArchiveData,
+    createViolation,
   } = useArchiveStore();
 
   const handleInputChange = (field, value) => {
@@ -19,18 +21,41 @@ const ArchiveModal = () => {
   };
 
   const handleFileChange = (files) => {
-    const updatedFiles = [...archiveData.uploadedFiles, ...Array.from(files)];
-    updateArchiveData("uploadedFiles", updatedFiles);
+    const updatedFiles = [
+      ...archiveData.documents,
+      ...Array.from(files).map((file) => ({
+        title: file.name,
+        file, // Gerçek dosya nesnesini ekliyoruz
+      })),
+    ];
+    updateArchiveData("documents", updatedFiles);
   };
 
   const handleRemoveFile = (index) => {
-    const updatedFiles = archiveData.uploadedFiles.filter((_, i) => i !== index);
-    updateArchiveData("uploadedFiles", updatedFiles);
+    const updatedFiles = archiveData.documents.filter((_, i) => i !== index);
+    updateArchiveData("documents", updatedFiles);
   };
 
-  const handleSubmit = () => {
-    console.log("Submitted data:", archiveData);
-    closeModal();
+  const handleSubmit = async () => {
+    try {
+      const formData = new FormData();
+      Object.keys(archiveData).forEach((key) => {
+        if (key === "documents") {
+          archiveData.documents.forEach((doc) => {
+            formData.append("documents", doc.file); // Belgeleri FormData'ya ekliyoruz
+          });
+        } else {
+          formData.append(key, archiveData[key]);
+        }
+      });
+
+      await createViolation(formData); // createViolation artık FormData bekliyor
+      console.log("Data submitted successfully");
+      resetArchiveData(); // Formu sıfırla
+      closeModal(); // Modalı kapat
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
   };
 
   return (
@@ -43,14 +68,14 @@ const ArchiveModal = () => {
       <div className="space-y-4">
         {/* Başvuran Ad-Soyad */}
         <div>
-          <label htmlFor="fullName" className="block font-semibold mb-1">
+          <label htmlFor="victimNameSurname" className="block font-semibold mb-1">
             Başvuran Ad-Soyad
           </label>
           <input
-            id="fullName"
+            id="victimNameSurname"
             type="text"
-            value={archiveData.fullName}
-            onChange={(e) => handleInputChange("fullName", e.target.value)}
+            value={archiveData.victimNameSurname || ""}
+            onChange={(e) => handleInputChange("victimNameSurname", e.target.value)}
             className="w-full border rounded p-2"
             placeholder="Ad ve soyad girin"
           />
@@ -60,8 +85,8 @@ const ArchiveModal = () => {
         <div>
           <label className="block font-semibold mb-1">Tarama Dönemi</label>
           <MonthYearPicker
-            value={archiveData.scanPeriod}
-            onChange={(value) => handleInputChange("scanPeriod", value)}
+            value={archiveData.monitoringPeriod || ""}
+            onChange={(value) => handleInputChange("monitoringPeriod", value)}
           />
         </div>
 
@@ -69,8 +94,8 @@ const ArchiveModal = () => {
         <div>
           <label className="block font-semibold mb-1">Arşiv Kategorisi</label>
           <ArchiveCategoryDropdown
-            selected={archiveData.archiveCategory}
-            onChange={(value) => handleInputChange("archiveCategory", value)}
+            selected={archiveData.type || ""}
+            onChange={(value) => handleInputChange("type", value)}
           />
         </div>
 
@@ -78,7 +103,7 @@ const ArchiveModal = () => {
         <div>
           <label className="block font-semibold mb-1">İhlal Kategorisi</label>
           <CategoryDropdown
-            selected={archiveData.eventCategory}
+            selected={archiveData.eventCategory || ""}
             onChange={(value) => handleInputChange("eventCategory", value)}
           />
         </div>
@@ -87,7 +112,7 @@ const ArchiveModal = () => {
         <div>
           <label className="block font-semibold mb-1">Olay Özeti</label>
           <TextArea
-            value={archiveData.eventSummary}
+            value={archiveData.eventSummary || ""}
             onChange={(value) => handleInputChange("eventSummary", value)}
             placeholder="Olay özeti girin"
           />
@@ -101,7 +126,7 @@ const ArchiveModal = () => {
           <input
             id="link"
             type="text"
-            value={archiveData.link}
+            value={archiveData.link || ""}
             onChange={(e) => handleInputChange("link", e.target.value)}
             className="w-full border rounded p-2"
             placeholder="Link girin"
@@ -117,9 +142,9 @@ const ArchiveModal = () => {
             onChange={(e) => handleFileChange(e.target.files)}
             className="block mb-2"
           />
-          {archiveData.uploadedFiles.map((file, index) => (
+          {archiveData.documents.map((doc, index) => (
             <div key={index} className="flex items-center justify-between mb-2">
-              <span>{file.name}</span>
+              <span>{doc.title}</span>
               <button
                 type="button"
                 onClick={() => handleRemoveFile(index)}
@@ -139,7 +164,7 @@ const ArchiveModal = () => {
           <input
             id="source"
             type="text"
-            value={archiveData.source}
+            value={archiveData.source || ""}
             onChange={(e) => handleInputChange("source", e.target.value)}
             className="w-full border rounded p-2"
             placeholder="Kaynak bilgisi girin"
@@ -148,14 +173,14 @@ const ArchiveModal = () => {
 
         {/* Görsel Link */}
         <div>
-          <label htmlFor="visualLink" className="block font-semibold mb-1">
+          <label htmlFor="imageLink" className="block font-semibold mb-1">
             Görsel Link
           </label>
           <input
-            id="visualLink"
+            id="imageLink"
             type="text"
-            value={archiveData.visualLink}
-            onChange={(e) => handleInputChange("visualLink", e.target.value)}
+            value={archiveData.imageLink || ""}
+            onChange={(e) => handleInputChange("imageLink", e.target.value)}
             className="w-full border rounded p-2"
             placeholder="Görsel linki girin"
           />
@@ -163,14 +188,14 @@ const ArchiveModal = () => {
 
         {/* STK Adı */}
         <div>
-          <label htmlFor="ngoName" className="block font-semibold mb-1">
+          <label htmlFor="ngoInstitutionName" className="block font-semibold mb-1">
             STK Adı
           </label>
           <input
-            id="ngoName"
+            id="ngoInstitutionName"
             type="text"
-            value={archiveData.ngoName}
-            onChange={(e) => handleInputChange("ngoName", e.target.value)}
+            value={archiveData.ngoInstitutionName || ""}
+            onChange={(e) => handleInputChange("ngoInstitutionName", e.target.value)}
             className="w-full border rounded p-2"
             placeholder="STK adı girin"
           />
@@ -178,14 +203,14 @@ const ArchiveModal = () => {
 
         {/* Baro Komisyon Adı */}
         <div>
-          <label htmlFor="barAssociationName" className="block font-semibold mb-1">
+          <label htmlFor="committeeName" className="block font-semibold mb-1">
             Baro Komisyon Adı
           </label>
           <input
-            id="barAssociationName"
+            id="committeeName"
             type="text"
-            value={archiveData.barAssociationName}
-            onChange={(e) => handleInputChange("barAssociationName", e.target.value)}
+            value={archiveData.committeeName || ""}
+            onChange={(e) => handleInputChange("committeeName", e.target.value)}
             className="w-full border rounded p-2"
             placeholder="Baro komisyon adını girin"
           />
@@ -199,7 +224,7 @@ const ArchiveModal = () => {
           <input
             id="publicInstitutionName"
             type="text"
-            value={archiveData.publicInstitutionName}
+            value={archiveData.publicInstitutionName || ""}
             onChange={(e) => handleInputChange("publicInstitutionName", e.target.value)}
             className="w-full border rounded p-2"
             placeholder="Kamu kurumu adını girin"

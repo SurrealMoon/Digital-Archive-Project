@@ -1,32 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Modal from "../Modal";
 import InputField from "../InputField";
 import TextArea from "../TextArea";
 import useCaseStore from "../../store/useCaseStore";
 
-const AddCaseDetailsModal = () => {
-  const {
-    isModalOpen,
-    formData,
-    setFormData,
-    closeModal,
-    addCase,
-    updateCase,
-    resetFormData,
-  } = useCaseStore();
+const AddCaseDetailsModal = ({ isOpen, onClose, caseData, onRefresh }) => {
+  const { formData, setFormData, resetFormData, updateCase } = useCaseStore();
+  const isEditMode = Boolean(caseData?.id);
 
-  const isEditMode = Boolean(formData.id); // Determine mode based on presence of an ID
+  useEffect(() => {
+    if (isOpen) {
+      isEditMode ? setFormData(caseData) : resetFormData();
+    }
+  }, [isOpen, isEditMode, caseData, setFormData, resetFormData]);
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
   };
 
   const handleFileChange = (files) => {
-    const updatedFiles = Array.from(files).map((file) => ({
+    const newFiles = Array.from(files).map(() => ({
       fileUrl: "",
       documentTitle: "",
     }));
-    setFormData({ documents: [...formData.documents, ...updatedFiles] });
+    setFormData({ documents: [...(formData.documents || []), ...newFiles] });
   };
 
   const handleRemoveFile = (index) => {
@@ -41,81 +38,77 @@ const AddCaseDetailsModal = () => {
   };
 
   const handleSubmit = async () => {
-    if (isEditMode) {
-      await updateCase();
+    console.log("formdata", formData.id)
+    try {
+      await updateCase(formData.id, formData);
       alert("Dava başarıyla güncellendi!");
-    } else {
-      await addCase();
-      alert("Dava başarıyla kaydedildi!");
+      onClose();
+      onRefresh();
+    } catch (error) {
+      console.error("Güncelleme hatası:", error);
+      alert("Güncelleme sırasında bir hata oluştu.");
     }
-    resetFormData();
-    closeModal();
   };
 
   return (
     <Modal
-      isOpen={isModalOpen}
-      title={isEditMode ? "Dava Güncelle" : "Yeni Dava Kaydı"}
-      onClose={closeModal}
+      isOpen={isOpen}
+      title={isEditMode ? "Dava Güncelle" : "Dava Detayları"}
+      onClose={onClose}
       onSubmit={handleSubmit}
     >
       <div className="space-y-4">
-        {/* Müvekkil Ad-Soyad */}
         <InputField
-          label="Müvekkil Ad-Soyad"
-          value={formData.clientname}
+          label="Başvuran Ad-Soyad"
+          value={formData.clientname || ""}
           onChange={handleChange("clientname")}
-          placeholder="Müvekkil adını ve soyadını giriniz"
+          placeholder="Başvuru adını giriniz"
         />
-        {/* Yetkili Diğer Avukat */}
         <InputField
           label="Yetkili Diğer Avukat"
-          value={formData.otherlawyer}
+          value={formData.otherlawyer || ""}
           onChange={handleChange("otherlawyer")}
           placeholder="Varsa yetkili diğer avukat adını giriniz"
         />
-        {/* Mahkeme Adı */}
         <InputField
           label="Mahkeme Adı"
-          value={formData.courtName}
+          value={formData.courtName || ""}
           onChange={handleChange("courtName")}
           placeholder="Mahkeme adını giriniz"
         />
-        {/* Dosya No */}
         <InputField
           label="Mahkeme Dosya Numarası"
-          value={formData.courtFileOrInvestigationNo}
+          value={formData.courtFileOrInvestigationNo || ""}
           onChange={handleChange("courtFileOrInvestigationNo")}
           placeholder="Mahkeme dosya numarasını giriniz"
         />
-        {/* Başlık */}
         <InputField
           label="Dava Başlığı"
-          value={formData.caseTitle}
+          value={formData.caseTitle || ""}
           onChange={handleChange("caseTitle")}
           placeholder="Dava başlığını giriniz"
         />
-        {/* Açıklama */}
         <TextArea
           label="Dava Açıklaması"
-          value={formData.caseDescription}
+          value={formData.caseDescription || ""}
           onChange={handleChange("caseDescription")}
           placeholder="Dava açıklamasını giriniz"
         />
-        {/* Dosya Yükleme */}
         <div>
           <label className="block font-semibold mb-1">Döküman Ekleme</label>
           <input
             type="file"
             multiple
             onChange={(e) => handleFileChange(e.target.files)}
+            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:text-gray-700 file:bg-gray-50 file:hover:bg-gray-100"
           />
-          {formData.documents.map((doc, index) => (
+          {formData.documents?.map((doc, index) => (
             <div key={index} className="flex items-center justify-between mt-2">
               <InputField
                 label="Döküman Başlığı"
-                value={doc.documentTitle}
+                value={doc.documentTitle || ""}
                 onChange={(value) => handleDocumentTitleChange(index, value)}
+                placeholder="Döküman başlığı giriniz"
               />
               <button
                 type="button"

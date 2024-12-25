@@ -1,30 +1,52 @@
 import Violation, { IViolation } from "../models/violation-model";
 
 // Yeni Hak İhlali Ekleme
-export const createViolationService = async (data: Partial<IViolation>): Promise<IViolation> => {
-  const violation = new Violation(data);
+export const createViolationService = async (
+  data: Partial<IViolation>, 
+  applicationId: string // applicationId parametresi eklendi
+): Promise<IViolation> => {
+  // Application ID'yi ekle
+  const violation = new Violation({ ...data, applicationId });
   return await violation.save();
 };
 
-// Tüm Hak İhlallerini Getirme
-export const getAllViolationsService = async (): Promise<IViolation[]> => {
-  return await Violation.find();
+
+// Tüm Hak İhlallerini Getirme (Application ID'ye göre)
+export const getAllViolationsService = async (
+  applicationId: string // applicationId parametresi eklendi
+): Promise<IViolation[]> => {
+  return await Violation.find({ applicationId }); // Application ID'ye göre filtreleme yapıldı
 };
 
-// Belirli Bir Hak İhlalini Getirme
-export const getViolationByIdService = async (id: string): Promise<IViolation | null> => {
-  return await Violation.findById(id);
-};
 
-// Hak İhlali Güncelleme
-export const updateViolationService = async (
-  id: string,
-  updates: Partial<IViolation>
+// Belirli Bir Hak İhlalini Getirme (ID ve Application ID'ye göre)
+export const getViolationByIdService = async (
+  id: string, 
+  applicationId: string // applicationId parametresi eklendi
 ): Promise<IViolation | null> => {
-  return await Violation.findByIdAndUpdate(id, updates, { new: true });
+  return await Violation.findOne({ _id: id, applicationId }); // Hem ID'yi hem de applicationId'yi kontrol ediyoruz
 };
 
-// Hak İhlali Silme
-export const deleteViolationService = async (id: string): Promise<IViolation | null> => {
-  return await Violation.findByIdAndDelete(id);
+
+// Hak İhlali Güncelleme (ID ve Application ID'ye göre)
+export const updateViolationService = async (
+  id: string, 
+  updates: Partial<IViolation>, 
+  applicationId: string // applicationId parametresi eklendi
+): Promise<IViolation | null> => {
+  return await Violation.findOneAndUpdate(
+    { _id: id, applicationId }, // Hem ID'yi hem de applicationId'yi kontrol ediyoruz
+    updates, 
+    { new: true }
+  );
 };
+
+
+// Hak İhlali Silme (ID ve Application ID'ye göre)
+export const deleteViolationService = async (
+  id: string, 
+  applicationId: string // applicationId parametresi eklendi
+): Promise<IViolation | null> => {
+  return await Violation.findOneAndDelete({ _id: id, applicationId }); // Hem ID'yi hem de applicationId'yi kontrol ediyoruz
+};
+

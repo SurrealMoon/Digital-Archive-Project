@@ -14,6 +14,7 @@ export interface IViolation extends Document {
   ngoInstitutionName?: string; // Only for NGO Data (optional)
   committeeName?: string; // Only for Bar Association Committees (optional)
   publicInstitutionName?: string; // Only for Public Institutions (optional)
+  applicationId?: mongoose.Types.ObjectId; // Başvuru referansı
 }
 
 // Violation Schema
@@ -45,6 +46,7 @@ const ViolationSchema = new Schema<IViolation>(
     ngoInstitutionName: { type: String }, // NGO Data için
     committeeName: { type: String }, // Bar Association Committees için
     publicInstitutionName: { type: String }, // Public Institutions için
+    applicationId: { type: mongoose.Schema.Types.ObjectId, ref: "Application" }, // Başvuru referansı
   },
   {
     timestamps: true, // Oluşturma ve güncelleme tarihleri

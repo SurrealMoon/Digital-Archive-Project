@@ -26,11 +26,10 @@ const CategoryDropdown = ({
       >
         <option value="" disabled>Seç</option>
         <optgroup label="Hak İhlali Arşiv Kategori">
-          <option value="Medya Taraması">Medya Taraması</option>
-          <option value="STK Verileri">STK Verileri</option>
-          <option value="Baro Komisyonları">Baro Komisyonları</option>
-          <option value="Kamu Kurumu">Kamu Kurumu</option>
-          
+          <option value="Media Monitoring">Medya Taraması</option>
+          <option value="NGO Data">STK Verileri</option>
+          <option value="Bar Association Committees">Baro Komisyonları</option>
+          <option value="Public Institutions">Kamu Kurumları</option>
         </optgroup>
       </select>
     </div>

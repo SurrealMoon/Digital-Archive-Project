@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstanceWeb";
 
 const useApplicationStore = create((set, get) => ({
-  applications: [], // Başvuruların listesi
+  applications: [],
   formData: {
     citizenId: "", // TC Kimlik numarası
     fullName: "", // Ad Soyad
@@ -32,10 +32,12 @@ const useApplicationStore = create((set, get) => ({
 
       console.log("Gönderilen Başvuru Payload:", applicationPayload);
 
-      const createResponse = await axios.post("api/applications/create", applicationPayload);
+      const createResponse = await axiosInstance.post(
+        "/applications/create",
+        applicationPayload
+      );
 
-      // Oluşturulan başvurunun ID'si
-      const applicationId = createResponse.data._id;
+      const applicationId = createResponse.data._id; // Oluşturulan başvurunun ID'si
 
       // Eğer birden fazla dosya yüklendiyse, dosyaları sırayla yükle
       if (formData.documents && formData.documents.length > 0) {
@@ -51,11 +53,15 @@ const useApplicationStore = create((set, get) => ({
             console.log("Yüklenmekte Olan Dosya Payload:", fileFormData);
 
             // Dosyayı yükleme
-            await axios.post(`/applications/${applicationId}/upload`, fileFormData, {
-              headers: {
-                "Content-Type": "multipart/form-data", // FormData için gerekli
-              },
-            });
+            await axiosInstance.post(
+              `/applications/${applicationId}/upload`, // Doğru endpoint
+              fileFormData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data", // FormData için gerekli
+                },
+              }
+            );
           }
         }
       }
@@ -79,83 +85,10 @@ const useApplicationStore = create((set, get) => ({
         error: null,
       }));
 
-      alert("Başvuru başarıyla oluşturuldu!");
+      console.log("Başvuru başarıyla oluşturuldu!");
     } catch (error) {
       set({ error: "Başvuru eklenirken bir hata oluştu." });
       console.error(error.response?.data || error.message);
-    }
-  },
-
-  // Başvurudan belge ekleme
-  addDocumentToApplication: async (applicationId, file, documentTitle) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("documentTitle", documentTitle);
-
-      const response = await axios.post(`api/applications/${applicationId}/upload`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // FormData için gerekli header
-        },
-      });
-
-      const { fileUrl } = response.data;
-
-      // Store'daki veriyi güncelle
-      set((state) => ({
-        formData: {
-          ...state.formData,
-          documents: [
-            ...state.formData.documents,
-            { fileUrl, documentTitle, uploadedAt: new Date() },
-          ],
-        },
-        error: null,
-      }));
-
-      console.log("Dosya başarıyla yüklendi:", fileUrl);
-    } catch (error) {
-      set({ error: "Dosya yükleme sırasında bir hata oluştu." });
-      console.error(error);
-    }
-  },
-
-  // Başvurudan belge silme
-  removeDocumentFromApplication: async (applicationId, index) => {
-    try {
-      const response = await axios.delete(`api/applications/${applicationId}/documents/${index}`);
-
-      const updatedDocuments = response.data.documents; // Güncellenmiş döküman listesi
-
-      // Store'daki formData'da dökümanları güncelle
-      set((state) => ({
-        formData: {
-          ...state.formData,
-          documents: updatedDocuments,
-        },
-        error: null,
-      }));
-
-      console.log("Belge başarıyla silindi:", updatedDocuments);
-    } catch (error) {
-      set({ error: "Belge silinirken bir hata oluştu." });
-      console.error(error);
-    }
-  },
-
-  loadFormData: () => {
-    try {
-      const savedFormData = JSON.parse(localStorage.getItem("formData"));
-      if (savedFormData) {
-        set((state) => ({
-          formData: {
-            ...state.formData,
-            ...savedFormData, // localStorage'dan gelen verileri mevcut formData ile birleştir
-          },
-        }));
-      }
-    } catch (error) {
-      console.error("loadFormData: localStorage'dan veri alınamadı.", error);
     }
   },
 
@@ -194,7 +127,7 @@ const useApplicationStore = create((set, get) => ({
         eventSummary: "",
         eventDetails: "",
         documents: [],
-        processedBy: "", // Başvuruyu alan kişi alanını sıfırla
+        processedBy: "",
       },
     }),
 }));

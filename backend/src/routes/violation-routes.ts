@@ -10,10 +10,10 @@ import {
 const router = express.Router();
 
 // CRUD Routes
-router.post("/", createViolation); // Yeni hak ihlali ekleme
-router.get("/", getAllViolations); // Tüm hak ihlallerini listeleme
+router.post("/create", createViolation); // Yeni hak ihlali ekleme
+router.get("/getall", getAllViolations); // Tüm hak ihlallerini listeleme
 router.get("/:id", getViolationById); // Belirli bir hak ihlalini getirme
-router.put("/:id", updateViolation); // Hak ihlali güncelleme
-router.delete("/:id", deleteViolation); // Hak ihlali silme
+router.put("/update/:id", updateViolation); // Hak ihlali güncelleme
+router.delete("/delete/:id", deleteViolation); // Hak ihlali silme
 
 export default router;

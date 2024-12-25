@@ -10,13 +10,12 @@ import useApplicationStore from "../store/useUserApplicationStore";
 
 const ApplicationForm = () => {
   const navigate = useNavigate();
-  // Zustand store'dan form verilerini alıyoruz
-  const { formData, setFormData, resetFormData, loadFormData } = useApplicationStore();
-
-  // Sayfa yüklendiğinde localStorage'dan veriyi almak
-  useEffect(() => {
-    loadFormData();
-  }, [loadFormData]);
+  const {
+    formData,
+    setFormData,
+    resetFormData,
+    addApplication
+  } = useApplicationStore();
 
   const handleChange = (field) => (value) => {
     setFormData({ [field]: value });
@@ -34,10 +33,15 @@ const ApplicationForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log('Form Gönderilirkenki Data:', formData);
-    alert('Başvuru başarıyla gönderildi!');
-    resetFormData();
-    navigate('/thank-you');
+    try {
+      await addApplication();
+      alert("Başvuru başarıyla gönderildi!");
+      resetFormData();
+      navigate("/thank-you");
+    } catch (error) {
+      console.error("Başvuru sırasında hata oluştu:", error);
+      alert("Başvuru sırasında bir hata oluştu.");
+    }
   };
 
   return (
@@ -99,10 +103,7 @@ const ApplicationForm = () => {
         <CategoryDropdown
           label="Olay Kategorisi"
           selected={formData.eventCategory}
-          onChange={(value) => {
-            handleChange("eventCategory")(value);
-            console.log("Seçilen Olay Kategorisi:", value);
-          }}
+          onChange={(value) => handleChange("eventCategory")(value)}
         />
 
         <InputField
@@ -118,13 +119,6 @@ const ApplicationForm = () => {
           onChange={handleChange("eventDetails")}
           placeholder="Olayın özetini giriniz"
           maxLength={500}
-          className="w-full"
-        />
-        <InputField
-          label="Döküman Bilgisi"
-          value={formData.documentTitle}
-          onChange={handleChange("documentTitle")}
-          placeholder="Döküman bilgilerini giriniz"
           className="w-full"
         />
 
@@ -157,7 +151,7 @@ const ApplicationForm = () => {
         <div className="flex justify-center">
           <Button
             label="Başvuruyu Gönder"
-            onClick={handleSubmit}
+            type="submit"
             className="w-1/2 bg-rose-700 text-white hover:bg-emerald-600 py-3 rounded-xl"
           />
         </div>
