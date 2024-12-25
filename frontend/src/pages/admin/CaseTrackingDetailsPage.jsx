@@ -3,6 +3,15 @@ import { useParams } from "react-router-dom";
 import useCaseStore from "../../store/useCaseStore";
 import AddCaseDetailsModal from "../../components/modals/AddCaseDetailsModal";
 
+const formatDate = (isoDate) => {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString("tr-TR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+};
+
 const CaseDetailsPage = () => {
   const { id } = useParams();
   const { fetchCases, cases } = useCaseStore();
@@ -19,12 +28,6 @@ const CaseDetailsPage = () => {
     setError(null);
     try {
       await fetchCases(); // Tüm davaları getir
-      const fetchedCase = cases.find((caseItem) => caseItem.id === id); // Belirli davayı bul
-      if (fetchedCase) {
-        setCaseData(fetchedCase);
-      } else {
-        setError("Dava bulunamadı.");
-      }
     } catch (err) {
       setError("Dava detayları getirilemedi. Lütfen tekrar deneyin.");
       console.error(err);
@@ -32,6 +35,18 @@ const CaseDetailsPage = () => {
       setLoading(false);
     }
   };
+
+  // Davayı bulmak için `cases` array'ini dinleyen bir useEffect
+  useEffect(() => {
+    if (cases.length > 0) {
+      const fetchedCase = cases.find((caseItem) => caseItem.id === id);
+      if (fetchedCase) {
+        setCaseData(fetchedCase);
+      } else {
+        setError("Dava bulunamadı.");
+      }
+    }
+  }, [cases, id]);
 
   useEffect(() => {
     fetchCaseDetails();
@@ -78,40 +93,43 @@ const CaseDetailsPage = () => {
           <span className="font-semibold text-gray-800">Adres:</span> {caseData.address}
         </div>
         <div className="mb-4">
-          <span className="font-semibold text-gray-800">Başvuru Tarihi:</span> {caseData.applicationDate}
-        </div>
+  <span className="font-semibold text-gray-800">Başvuru Tarihi:</span> {caseData.applicationDate ? formatDate(caseData.applicationDate) : "Belirtilmemiş"}
+</div>
         <div className="mb-4">
           <span className="font-semibold text-gray-800">Olay Başlık:</span> {caseData.eventSummary}
         </div>
-        <div className="mb-4"
-        style={{
-          wordWrap: 'break-word', 
-          whiteSpace: 'normal',   
-          overflowWrap: 'break-word',
-        }}>
+        <div
+          className="mb-4"
+          style={{
+            wordWrap: "break-word",
+            whiteSpace: "normal",
+            overflowWrap: "break-word",
+          }}
+        >
           <span className="font-semibold text-gray-800">Olay Özeti:</span> {caseData.eventDetails}
         </div>
         <div className="mb-4">
-          <span className="font-semibold text-gray-800">Belgeler:</span>
-          {caseData.documents?.length > 0 ? (
-            <ul>
-              {caseData.documents.map((doc, index) => (
-                <li key={index}>
-                  <a
-                    href={doc.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline"
-                  >
-                    {doc.documentTitle || doc.fileUrl}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            "Belge bulunamadı."
-          )}
-        </div>
+  <span className="font-semibold text-gray-800">Belgeler:</span>
+  {caseData.applicationDocuments?.length > 0 ? (
+    <ul>
+      {caseData.applicationDocuments.map((doc, index) => (
+        <li key={index}>
+          <a
+            href={doc.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            {doc.documentTitle || doc.fileUrl}
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    "Belge bulunamadı."
+  )}
+</div>
+
       </div>
 
       {/* Dava Detayları */}
@@ -121,20 +139,25 @@ const CaseDetailsPage = () => {
           <span className="font-semibold text-gray-800">Müvekkil:</span> {caseData.clientname}
         </div>
         <div className="mb-4">
+    <span className="font-semibold text-gray-800">Yetkili Diğer Avukat:</span> {caseData.otherlawyer || "Belirtilmemiş"}
+  </div>
+        <div className="mb-4">
           <span className="font-semibold text-gray-800">Mahkeme Adı:</span> {caseData.courtName}
         </div>
         <div className="mb-4">
-          <span className="font-semibold text-gray-800">Dosya No:</span> {caseData.courtFileOrInvestigationNo}
+          <span className="font-semibold text-gray-800">Mahkeme Dosya No.:</span> {caseData.courtFileOrInvestigationNo}
         </div>
         <div className="mb-4">
           <span className="font-semibold text-gray-800">Dava Başlığı:</span> {caseData.caseTitle}
         </div>
-        <div className="mb-4"
-        style={{
-          wordWrap: 'break-word', 
-          whiteSpace: 'normal',   
-          overflowWrap: 'break-word', 
-        }}>
+        <div
+          className="mb-4"
+          style={{
+            wordWrap: "break-word",
+            whiteSpace: "normal",
+            overflowWrap: "break-word",
+          }}
+        >
           <span className="font-semibold text-gray-800">Dava Açıklaması:</span> {caseData.caseDescription}
         </div>
         <div className="mb-4">
